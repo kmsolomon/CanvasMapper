@@ -2,3 +2,118 @@ body {
     font-family: Verdana, Arial, Helvetica, sans-serif;
     text-align:  center;
 }
+
+#workspace {
+    border: 2px solid #000;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 0;
+    padding-right: 0;
+}
+/***********
+ *  Toolbar
+ ***********/
+#toolbar{
+    list-style: none;
+    float: left;
+    
+}
+
+#toolbar li{
+    border-left: 2px solid #000;
+    border-right: 2px solid #000;
+    border-bottom: 2px solid #000;
+}
+
+#toolbar li:first-child{
+    border-top: 2px solid #000;
+}
+
+.selectBtn{
+    width: 44px;
+    height: 44px;
+    background-size: 44px 44px;
+    background-image: url(../images/cursor_active.svg);
+}
+
+.selectBtn:not(.active){
+    width: 44px;
+    height: 44px;
+    background-size: 44px 44px;
+    background-image: url(../images/cursor.svg);
+}
+
+.stationBtn{
+    width: 44px;
+    height: 44px;
+    background-size: 44px 44px;
+    background-image: url(../images/station_active.svg);
+}
+
+.stationBtn:not(.active){
+    width: 44px;
+    height: 44px;
+    background-size: 44px 44px;
+    background-image: url(../images/station.svg);
+}
+
+
+.connectionBtn{
+    width: 44px;
+    height: 44px;
+    background-size: 44px 44px;
+    background-image: url(../images/connection_active.svg);
+}
+
+.connectionBtn:not(.active){
+    width: 44px;
+    height: 44px;
+    background-size: 44px 44px;
+    background-image: url(../images/connection.svg);
+}
+
+.deleteBtn{
+    width: 44px;
+    height: 44px;
+    background-size: 44px 44px;
+    background-image: url(../images/delete.svg);
+}
+
+.deleteBtn:active{
+    width: 44px;
+    height: 44px;
+    background-size: 44px 44px;
+    background-image: url(../images/delete_active.svg);
+}
+
+.undoBtn{
+    width: 44px;
+    height: 44px;
+    background-size: 44px 44px;
+    background-image: url(../images/undo.svg);
+}
+
+.undoBtn:active{
+    width: 44px;
+    height: 44px;
+    background-size: 44px 44px;
+    background-image: url(../images/undo_active.svg);
+}
+
+
+.redoBtn{
+    width: 44px;
+    height: 44px;
+    background-size: 44px 44px;
+    background-image: url(../images/redo.svg);
+}
+
+.redoBtn:active{
+    width: 44px;
+    height: 44px;
+    background-size: 44px 44px;
+    background-image: url(../images/redo_active.svg);
+}
+
+
