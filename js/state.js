@@ -31,6 +31,8 @@ define(
       this.dragoffy = 0;
       
       var myState = this;
+      // fixes double clicking causing text not on canvas to get selected
+      canvas.addEventListener('selectstart', function(e) { e.preventDefault(); return false; }, false);
       
       canvas.addEventListener('mousedown', function(e) {
         var tool = Tools.activeTool();
@@ -43,22 +45,12 @@ define(
         for (var i = l-1; i >= 0; i--) {
           if (shapes[i].contains(mx, my)) {
             var mySel = shapes[i];
+            myState.selection = mySel;
             // Keep track of where in the object we clicked
             // so we can move it smoothly (see mousemove)
             myState.dragoffx = mx - mySel.x;
             myState.dragoffy = my - mySel.y;
-            if(tool === "select"){
-              myState.dragging = true;
-              UndoRedo.addToUndoHistory(new HistoryStep("move", {id: shapes[i].id, x: shapes[i].x, y: shapes[i].y}));
-              myState.selection = mySel;
-            } else if (tool === "addConnection"){
-              myState.selection = mySel;
-              myState.connecting = true;
-              var line = new Connection(mySel, mouse);
-              mySel.connections.push(line);
-              myState.activeLine = line;
-              shapes.push(line);
-            }
+            tool.mouseDown(e, myState);
             myState.valid = false;
             return;
           }
@@ -122,13 +114,7 @@ define(
       // Single click with the add station tool adds a station
       canvas.addEventListener('click', function(e) {
         var tool = Tools.activeTool();
-        if(tool === "addStation"){
-          var mouse = myState.getMouse(e);
-          var s = new Station(mouse.x - 10, mouse.y - 10, 20, 20, 'rgba(0,255,0,.6)');
-          UndoRedo.addToUndoHistory(new HistoryStep("add", s));
-          myState.addShape(s);  
-          myState.selection = s;
-        }
+        tool.click(e, myState);
       }, true);
       
       this.selectionColor = '#CC0000';

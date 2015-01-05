@@ -13,12 +13,13 @@ var state = null;
 requirejs.config({
     baseUrl: 'js',
     paths: {
-        jquery: 'lib/jquery-1.11.1.min'
+        jquery: 'lib/jquery-1.11.1.min',
+        spectrum: 'lib/spectrum/spectrum'
     }
 });
 
-requirejs(['jquery', 'undoredo', 'station', 'connection', 'toolbar', 'historystep', 'state'],
-function   ($, UndoRedo, Station, Connection, Tools, HistoryStep, CanvasState) {
+requirejs(['jquery', 'undoredo', 'station', 'connection', 'toolbar', 'historystep', 'state', 'spectrum'],
+function   ($, UndoRedo, Station, Connection, Tools, HistoryStep, CanvasState, Spectrum) {
     
     $('#select').on('click', function(e) { Tools.changeTool(e); });
     $('#addStation').on('click', function(e) { Tools.changeTool(e); });
