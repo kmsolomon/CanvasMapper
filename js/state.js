@@ -58,6 +58,8 @@ define(
         // havent returned means we have failed to select anything.
         // If there was an object selected, we deselect it
         if (myState.selection) {
+          myState.selection.updateValues(); // make sure we get any changes that were made to properties
+          $('#propdiv').empty();
           myState.selection = null;
           myState.valid = false; // Need to clear the old selection border
         }

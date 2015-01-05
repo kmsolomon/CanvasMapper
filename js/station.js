@@ -30,23 +30,29 @@ define('station',
       
       displayProperties: function(state) {
         var station = this;
+        var initialFill = this.fill;
         $("#propdiv").empty();
         
-        var properties = "<table><tr><td id='stNameLabel'>Name: </td><td id='stNameField'><input type='text' id='stNameInput' /></td></tr>";
+        var properties = "<table id='stProperties'><tr><td id='stNameLabel'>Name: </td><td id='stNameField'><input type='text' id='stNameInput' /></td></tr>";
         properties += "<tr><td id='stXLabel'>X: </td><td id='stXField'><input type='text' id='stXInput' /></td></tr>";
         properties += "<tr><td id='stYLabel'>Y: </td><td id='stYField'><input type='text' id='stYInput' /></td></tr>";
         properties += "<tr><td id='stZLabel'>Z: </td><td id='stZField'><input type='text' id='stZInput' /></td></tr>";
         properties += "<tr><td id='stColorLabel'>Color: </td><td id='stColorField'><input type='text' id='custom' /></td></tr>";
         properties += "</table>";
+
      
         $('#propdiv').append(properties);
+        $('#stNameInput').val(station.name);
+        $('#stXInput').val(station.xcoord);
+        $('#stYInput').val(station.ycoord);
+        $('#stZInput').val(station.zcoord);
         $("#custom").spectrum({
           clickoutFiresChange: true,
           showPaletteOnly: true,
           togglePaletteOnly: true,
           togglePaletteMoreText: 'more',
           togglePaletteLessText: 'less',
-          color: '#00FF00',
+          color: initialFill,
           palette: [
             ["#000","#444","#666","#999","#ccc","#eee","#f3f3f3","#fff"],
             ["#f00","#f90","#ff0","#0f0","#0ff","#00f","#90f","#f0f"],
@@ -62,7 +68,25 @@ define('station',
                 state.valid = false;
             }
         });
+        
+        $("#stProperties").focusout( function() {
+            var name = $("#stNameInput").val();
+            var x = $("#stXInput").val();
+            var y = $("#stYInput").val();
+            var z = $("#stZInput").val();
+            station.name = name;
+            station.xcoord = x;
+            station.ycoord = y;
+            station.zcoord = z;
+        });
 
+      },
+      
+      updateValues: function() {
+        this.name = $("#stNameInput").val();
+        this.xcoord = $("#stXInput").val();
+        this.ycoord = $("#stYInput").val();
+        this.zcoord = $("#stZInput").val();
       }
        
     };
