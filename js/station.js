@@ -23,11 +23,13 @@ define('station',
         ctx.fillRect(this.x, this.y, this.w, this.h);
 
         if(this.name !== null){
-          ctx.fillStyle = '#000';
           ctx.font = '12px Courier';
           var metrics = ctx.measureText(this.name);
           var width = metrics.width;
           var center = width/2 - 15;
+          ctx.fillStyle = '#FFF';
+          ctx.fillRect(this.x-center, this.y+35, width, 15);
+          ctx.fillStyle = '#000';
           ctx.fillText(this.name, this.x-center, this.y+45);
         }
       },

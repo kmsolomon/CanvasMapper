@@ -195,16 +195,39 @@ define(
             
           // draw all shapes
           var l = shapes.length;
+          
+          // want to draw connections first
           for (var i = 0; i < l; i++) {
             var shape = shapes[i];
             if(shape === undefined){
                 console.error("something went wrong");
                 return;
             }
-            // We can skip the drawing of elements that have moved off the screen:
-            if (shape.x > this.width || shape.y > this.height ||
-                shape.x + shape.w < 0 || shape.y + shape.h < 0) continue;
-            shapes[i].draw(ctx);
+            if(shape.type == "connection"){
+              // We can skip the drawing of elements that have moved off the screen:
+              if (shape.x > this.width || shape.y > this.height ||
+                  shape.x + shape.w < 0 || shape.y + shape.h < 0){
+                continue;        
+              }
+                shapes[i].draw(ctx);
+            }
+          }
+          
+          // now draw the stations
+          for (var i = 0; i < l; i++) {
+            var shape = shapes[i];
+            if(shape === undefined){
+                console.error("something went wrong");
+                return;
+            }
+            if(shape.type == "station"){
+              // We can skip the drawing of elements that have moved off the screen:
+              if (shape.x > this.width || shape.y > this.height ||
+                  shape.x + shape.w < 0 || shape.y + shape.h < 0){
+                continue;        
+              }
+                shapes[i].draw(ctx);
+            }
           }
             
           // draw selection
