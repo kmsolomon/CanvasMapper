@@ -132,33 +132,26 @@ define(
       },
       
       removeShape: function(shape) {
-        console.log("current shape to remove");
-        console.log(shape);
+
         var l = this.shapes.length;
         for (var i = l-1; i >= 0; i--) {
-           console.log("in for loop");
           if (this.shapes[i].id === shape.id) {
             this.selection = null;
             this.valid = false;
             this.shapes.splice(i, 1);
           }
           if(this.shapes[i] && this.shapes[i].type === "connection"){
-            console.log("shape is a connection");
-            console.log(this.shapes[i].includes(shape));
             if(this.shapes[i].includes(shape)){
               this.removeShape(this.shapes[i]);
             }
           }
           if(shape.type === "connection"){
               // need to make sure we take it out of the station connection arrays
-              console.log("in the remove connections part");
               var start = shape.start;
               var end = shape.end;
               if(start.type === "station" && end.type === "station"){
                   return;
               }
-              console.log(start);
-              console.log(end);
               if(start.type === "station"){
                 for( var j = 0; j < start.connections.length; j++){
                     if(start.connections &&start.connections[j].id === shape.id){
