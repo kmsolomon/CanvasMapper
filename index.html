@@ -8,7 +8,9 @@
     <script data-main="js/main" src="js/lib/require.js"></script>
    </head>
    <body>
+     <div class="header">
      <h1>CanvasMapper</h1>
+     </div>
      <div id="toolbarDiv">
        <ul id="toolbar">
          <li id="select" class="active selectBtn"></li>
@@ -19,6 +21,13 @@
          <li id="redo" class="redoBtn"></li>
        </ul>  
      </div>
+     <div id="saveDiv">
+          <ul id="saveMenu">
+            <li id="downloadPNG" download="canvasMap.png">Download as PNG</li>
+            <li id="downloadJSON" download="application/json">Download as JSON</li>
+            <li id="importJSON">Import from JSON</li>
+          </ul>
+       </div>
      <div id="properties">
          <h1>Properties</h1>
          <div id="propdiv">

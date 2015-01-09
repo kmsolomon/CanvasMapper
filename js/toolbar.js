@@ -40,6 +40,7 @@ define(
      if(state.selection){
        UndoRedo.addToUndoHistory(new HistoryStep("delete", state.selection));
        state.removeShape(state.selection);    
+       $('#propdiv').empty();
       }
    }
       

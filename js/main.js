@@ -14,12 +14,14 @@ requirejs.config({
     baseUrl: 'js',
     paths: {
         jquery: 'lib/jquery-1.11.1.min',
-        spectrum: 'lib/spectrum/spectrum'
+        spectrum: 'lib/spectrum/spectrum',
+        canvastoBlob: 'lib/canvas-toBlob/canvas-toBlob',
+        fileSaver: 'lib/FileSaver/FileSaver.min'
     }
 });
 
-requirejs(['jquery', 'undoredo', 'station', 'connection', 'toolbar', 'historystep', 'state', 'spectrum'],
-function   ($, UndoRedo, Station, Connection, Tools, HistoryStep, CanvasState, Spectrum) {
+requirejs(['jquery', 'undoredo', 'station', 'connection', 'toolbar', 'historystep', 'state', 'spectrum', 'export'],
+function   ($, UndoRedo, Station, Connection, Tools, HistoryStep, CanvasState, Spectrum, Export) {
     
     $('#select').on('click', function(e) { Tools.changeTool(e); });
     $('#addStation').on('click', function(e) { Tools.changeTool(e); });
@@ -28,9 +30,13 @@ function   ($, UndoRedo, Station, Connection, Tools, HistoryStep, CanvasState, S
     $('#undo').on('click', function(e) { UndoRedo.undo(e); });
     $('#redo').on('click', function(e) { UndoRedo.redo(e); });
     
+    $('#downloadPNG').on('click', function(e) {Export.exportAsPNG(); });
+    
     // TODO Would be nice to be able to resize the canvas later
     var canvas = document.getElementById('workspace');
     canvas.setAttribute('width', '800');
     canvas.setAttribute('height', '600');
     state = new CanvasState(canvas);
+    
+    $('#downloadJSON').on('click', function(e) {Export.exportAsJSON(state); });
 });

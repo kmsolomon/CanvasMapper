@@ -8,7 +8,7 @@ define(
       this.width = canvas.width;
       this.height = canvas.height;
       this.ctx = canvas.getContext('2d');
-     
+      
       var stylePaddingLeft, stylePaddingTop, styleBorderLeft, styleBorderTop;
       if (document.defaultView && document.defaultView.getComputedStyle) {
         this.stylePaddingLeft = parseInt(document.defaultView.getComputedStyle(canvas, null)['paddingLeft'], 10)      || 0;
@@ -192,7 +192,8 @@ define(
           var ctx = this.ctx;
           var shapes = this.shapes;
           this.clear();
-            
+          ctx.fillStyle = '#FFF';
+          ctx.fillRect(0, 0, this.width, this.height); // Draw white background so it's not transparent when downloaded'
           // draw all shapes
           var l = shapes.length;
           

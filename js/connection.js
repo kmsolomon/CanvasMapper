@@ -23,7 +23,11 @@ define(
         ctx.lineWidth = this.width;
         ctx.beginPath();
         ctx.moveTo(this.start.x+15 ,this.start.y+15); // will eventually want to do some fixing up to make sure the line starts on the correct side
-        ctx.lineTo(this.end.x+15, this.end.y+15);
+        if(this.end.type == "station"){
+          ctx.lineTo(this.end.x+15, this.end.y+15);
+        } else {
+          ctx.lineTo(this.end.x, this.end.y);   
+        }
         ctx.stroke();
       },
       
