@@ -16,6 +16,10 @@ body {
     display: inline;
 }
 
+#importFile {
+    display: none;
+}
+
 /***********
  *  SaveMenu
  ***********/

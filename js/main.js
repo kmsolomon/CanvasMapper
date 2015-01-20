@@ -20,8 +20,8 @@ requirejs.config({
     }
 });
 
-requirejs(['jquery', 'undoredo', 'station', 'connection', 'toolbar', 'historystep', 'state', 'spectrum', 'export'],
-function   ($, UndoRedo, Station, Connection, Tools, HistoryStep, CanvasState, Spectrum, Export) {
+requirejs(['jquery', 'undoredo', 'station', 'connection', 'toolbar', 'historystep', 'state', 'spectrum', 'export', 'import'],
+function   ($, UndoRedo, Station, Connection, Tools, HistoryStep, CanvasState, Spectrum, Export, Import) {
     
     $('#select').on('click', function(e) { Tools.changeTool(e); });
     $('#addStation').on('click', function(e) { Tools.changeTool(e); });
@@ -39,4 +39,5 @@ function   ($, UndoRedo, Station, Connection, Tools, HistoryStep, CanvasState, S
     state = new CanvasState(canvas);
     
     $('#downloadJSON').on('click', function(e) {Export.exportAsJSON(state); });
+    $('#importFile').on('change', function(e) {Import.importFromJSON(e, state); });
 });
