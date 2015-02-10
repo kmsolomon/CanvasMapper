@@ -1,6 +1,4 @@
 //Globals
-var stations = new Array(); // The array of Stations
-var connections = new Array(); // The array of Connections
 var undoHistory = new Array();
 var redoHistory = new Array();
 var uStep = 0;
