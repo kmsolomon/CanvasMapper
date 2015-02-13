@@ -27,10 +27,13 @@ define('station',
           var metrics = ctx.measureText(this.name);
           var width = metrics.width;
           var center = width/2 - 15;
+          var halfStation = this.w/2;
+          var smallpad = 5;
+          var largepad = 10;
           ctx.fillStyle = '#FFF';
-          ctx.fillRect(this.x-center, this.y+35, width, 15);
+          ctx.fillRect(this.x-center, this.y + this.h + smallpad, width, halfStation);
           ctx.fillStyle = '#000';
-          ctx.fillText(this.name, this.x-center, this.y+45);
+          ctx.fillText(this.name, this.x-center, this.y+this.h+largepad);
         }
       },
       
