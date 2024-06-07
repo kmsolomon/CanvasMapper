@@ -1,41 +1,60 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>CanvasMapper</title>
-    <link type="text/css" rel="stylesheet" href="css/main.css"/>
-    <link type="text/css" rel="stylesheet" href="css/spectrum.css"/>
-    <script data-main="js/main" src="js/lib/require.js"></script>
-   </head>
-   <body>
-     <div class="header">
-     <h1>CanvasMapper</h1>
-     </div>
-     <div id="toolbarDiv">
-       <ul id="toolbar">
-         <li id="select" class="active selectBtn"></li>
-         <li id="addStation" class ="stationBtn"></li>
-         <li id="addConnection" class="connectionBtn"></li>
-         <li id="delete" class="deleteBtn"></li>  
-         <li id="undo" class="undoBtn"></li>
-         <li id="redo" class="redoBtn"></li>
-       </ul>  
-     </div>
-     <div id="saveDiv">
-          <ul id="saveMenu">
-            <li id="downloadPNG" download="canvasMap.png">Download as PNG</li>
-            <li id="downloadJSON" download="application/json">Download as JSON</li>
-            <li id="importJSON">
-              <label id="importFromJSONBtn" for="importFile">Import from JSON</label>
-              <input id="importFile" type="file" name="jsonFile" accept="application/json"></li>
-          </ul>
-       </div>
-     <div id="properties">
-         <h1>Properties</h1>
-         <div id="propdiv">
-           Nothing is selected
-         </div>
-     </div>
-     <canvas id="workspace"></canvas>
-   </body>
+    <link type="text/css" rel="stylesheet" href="/src/styles/main.css" />
+    <link type="text/css" rel="stylesheet" href="/src/styles/spectrum.css" />
+  </head>
+  <body>
+    <div class="header">
+      <h1>CanvasMapper</h1>
+    </div>
+    <div class="toolbar">
+      <button
+        id="selectBtn"
+        class="active btn"
+        aria-label="Select"
+        aria-pressed="true"
+      ></button>
+      <button
+        id="stationBtn"
+        class="btn"
+        aria-label="Add station"
+        aria-pressed="false"
+      ></button>
+      <button
+        id="connectionBtn"
+        class="btn"
+        aria-label="Add conneciton"
+        aria-pressed="false"
+      ></button>
+      <button id="deleteBtn" class="btn" aria-label="Delete selected"></button>
+      <button id="undoBtn" class="btn" aria-label="Undo"></button>
+      <button id="redoBtn" class="btn" aria-label="Redo"></button>
+    </div>
+    <div id="saveDiv">
+      <ul id="saveMenu">
+        <li id="downloadPNG" download="canvasMap.png">Download as PNG</li>
+        <li id="downloadJSON" download="application/json">Download as JSON</li>
+        <li id="importJSON">
+          <label id="importFromJSONBtn" for="importFile"
+            >Import from JSON</label
+          >
+          <input
+            id="importFile"
+            type="file"
+            name="jsonFile"
+            accept="application/json"
+          />
+        </li>
+      </ul>
+    </div>
+    <div id="properties">
+      <h1>Properties</h1>
+      <div id="propdiv">Nothing is selected</div>
+    </div>
+    <canvas id="workspace"></canvas>
+    <script type="module" src="/src/js/main.js"></script>
+  </body>
 </html>
