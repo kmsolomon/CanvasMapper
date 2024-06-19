@@ -1,3 +1,5 @@
+import Station from "./station";
+
 function activeTool() {
   var active = document.querySelector(".active");
   if (active.id) {
@@ -44,4 +46,24 @@ function deletePart(e) {
   }
 }
 
-export { changeTool, deletePart };
+function handleAddStation(e, cm) {
+  const mouse = { x: e.pageX, y: e.pageY }; // TODO -- offset
+  const offset = cm.canvas.getMouseOffset();
+  const newStation = new Station(
+    mouse.x - offset.x - 15,
+    mouse.y - offset.y - 15,
+    30,
+    30,
+    "rgba(0,255,0,1)",
+    cm.snum
+  );
+  cm.incrementSNum();
+  //UndoRedo.addToUndoHistory(new HistoryStep("add", newStation));
+  cm.canvas.addShape(newStation);
+  cm.canvas.selection = newStation;
+
+  // then display options in properties
+  newStation.displayProperties(cm.canvas);
+}
+
+export { handleAddStation, changeTool, deletePart };

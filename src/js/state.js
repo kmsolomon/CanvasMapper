@@ -1,271 +1,292 @@
-define(
-  ['jquery', 'undoredo', 'station', 'connection', 'historystep', 'toolbar'],
-  function ($, UndoRedo, Station, Connection, HistoryStep, Tools) {
-    
-    function CanvasState(canvas) {
-  
-      this.canvas = canvas;
-      this.width = canvas.width;
-      this.height = canvas.height;
-      this.ctx = canvas.getContext('2d');
-      
-      var stylePaddingLeft, stylePaddingTop, styleBorderLeft, styleBorderTop;
-      if (document.defaultView && document.defaultView.getComputedStyle) {
-        this.stylePaddingLeft = parseInt(document.defaultView.getComputedStyle(canvas, null)['paddingLeft'], 10)      || 0;
-        this.stylePaddingTop  = parseInt(document.defaultView.getComputedStyle(canvas, null)['paddingTop'], 10)       || 0;
-        this.styleBorderLeft  = parseInt(document.defaultView.getComputedStyle(canvas, null)['borderLeftWidth'], 10)  || 0;
-        this.styleBorderTop   = parseInt(document.defaultView.getComputedStyle(canvas, null)['borderTopWidth'], 10)   || 0;
-      }
+export default class CanvasState {
+  #canvas;
+  #width;
+  #height;
+  #ctx;
+  #stylePaddingLeft = 0;
+  #stylePaddingTop = 0;
+  #styleBorderLeft = 0;
+  #styleBorderTop = 0;
+  #valid = false; // false to redraw
+  #shapes = []; // the stations, connections, etc. to draw
+  #dragging = false; // need to know when dragging
+  #activeLine = null;
+  #connecting = false; // know when we're drawing a connection
+  #selection = null;
+  #dragoffx = 0;
+  #dragoffy = 0;
+  #myState = this;
+  #selectionColor = "#CC0000";
+  #selectionWidth = 2;
+  #interval = 30;
+  // TODO -- I feel like there's a better way to do this/shouldn't be accessing these within the state
+  #htmlTop = document.body.parentNode.offsetTop;
+  #htmlLeft = document.body.parentNode.offsetLeft;
 
-      var html = document.body.parentNode;
-      this.htmlTop = html.offsetTop;
-      this.htmlLeft = html.offsetLeft;
-      
-      this.valid = false; // false to redraw
-      this.shapes = [];  // the stations, connections, etc. to draw
-      this.dragging = false; // need to know when dragging
-      this.activeLine = null;
-      this.connecting = false; // know when we're drawing a connection
-      this.selection = null;
-      this.dragoffx = 0;
-      this.dragoffy = 0;
-      
-      var myState = this;
-      // fixes double clicking causing text not on canvas to get selected
-      canvas.addEventListener('selectstart', function(e) { e.preventDefault(); return false; }, false);
-      
-      canvas.addEventListener('mousedown', function(e) {
-        var tool = Tools.activeTool();
-    
-        var mouse = myState.getMouse(e);
-        var mx = mouse.x;
-        var my = mouse.y;
-        var shapes = myState.shapes;
-        var l = shapes.length;
-        for (var i = l-1; i >= 0; i--) {
-          if (shapes[i].contains(mx, my)) {
-            var mySel = shapes[i];
-            myState.selection = mySel;
-            // Keep track of where in the object we clicked
-            // so we can move it smoothly (see mousemove)
-            myState.dragoffx = mx - mySel.x;
-            myState.dragoffy = my - mySel.y;
-            tool.mouseDown(e, myState);
-            myState.valid = false;
-            return;
-          }
-        }
-        // havent returned means we have failed to select anything.
-        // If there was an object selected, we deselect it
-        if (myState.selection) {
-          myState.selection.updateValues(); // make sure we get any changes that were made to properties
-          $('#propdiv').empty();
-          myState.selection = null;
-          myState.valid = false; // Need to clear the old selection border
-        }
-      }, true);
-      canvas.addEventListener('mousemove', function(e) {
-        if (myState.dragging){
-          var mouse = myState.getMouse(e);
-          // Don't want to drag the object by its top-left corner, that's what offset is for
-          myState.selection.x = mouse.x - myState.dragoffx;
-          myState.selection.y = mouse.y - myState.dragoffy;   
-          myState.valid = false; // Something's dragging so we must redraw
-        }
-        if(myState.connecting){
-          var mouse = myState.getMouse(e);
-          myState.activeLine.end.x = mouse.x;
-          myState.activeLine.end.y = mouse.y;
-          myState.valid = false;
-        }
-      }, true);
-      canvas.addEventListener('mouseup', function(e) {
-        myState.dragging = false;
-        if(myState.connecting){
-          // check that we ended on a station
-          // if yes, add that as the end point
-          // if not, remove the line
-          var validConnection = false;
-          var mouse = myState.getMouse(e);
-          var mx = mouse.x;
-          var my = mouse.y;
-          var shapes = myState.shapes;
-          var l = shapes.length;
-          for (var i = l-1; i >= 0; i--) {
-            if (shapes[i].contains(mx, my) && shapes[i].id !== myState.selection.id) {
-              console.log('valid connection');
-              // was a valid shape, we're happy
-              validConnection = true;
-              myState.activeLine.end = shapes[i];
-              shapes[i].connections.push(myState.activeLine);
-              UndoRedo.addToUndoHistory(new HistoryStep("add", myState.activeLine));
+  constructor(canvas) {
+    this.#canvas = canvas;
+    this.#width = canvas.width;
+    this.#height = canvas.height;
+    this.#ctx = canvas.getContext("2d");
+    this.draw = this.draw.bind(this);
+    this.#styleBorderLeft = Number.parseInt(
+      getComputedStyle(canvas)
+        .getPropertyValue("border-left-width")
+        .slice(0, -2),
+      10
+    );
+    this.#styleBorderTop = Number.parseInt(
+      getComputedStyle(canvas)
+        .getPropertyValue("border-top-width")
+        .slice(0, -2),
+      10
+    );
 
-            }
-          } 
-          if(!validConnection){
-            console.log("was not a valid connection");
-            // should find and remove the connection from the shape
-            // but that should be handled in removeShape()?
-            myState.removeShape(myState.activeLine); 
-
-          } 
-          myState.activeLine = null;
-        }
-        myState.connecting = false;
-      }, true);
-      // Single click with the add station tool adds a station
-      canvas.addEventListener('click', function(e) {
-        var tool = Tools.activeTool();
-        tool.click(e, myState);
-      }, true);
-      
-      this.selectionColor = '#CC0000';
-      this.selectionWidth = 2;  
-      this.interval = 30;
-      setInterval(function() { myState.draw(); }, myState.interval);
-    }
-    
-    CanvasState.prototype = {
-      addShape: function(shape) {
-        this.shapes.push(shape);
-        this.valid = false;
-      },
-      
-      removeShape: function(shape) {
-
-        var l = this.shapes.length;
-        for (var i = l-1; i >= 0; i--) {
-          if (this.shapes[i].id === shape.id) {
-            this.selection = null;
-            this.valid = false;
-            this.shapes.splice(i, 1);
-          }
-          if(this.shapes[i] && this.shapes[i].type === "connection"){
-            if(this.shapes[i].includes(shape)){
-              this.removeShape(this.shapes[i]);
-            }
-          }
-          if(shape.type === "connection"){
-              // need to make sure we take it out of the station connection arrays
-              var start = shape.start;
-              var end = shape.end;
-              if(start.type === "station" && end.type === "station"){
-                  return;
-              }
-              if(start.type === "station"){
-                for( var j = 0; j < start.connections.length; j++){
-                    if(start.connections &&start.connections[j].id === shape.id){
-                      start.connections.splice(j, 1);
-                    }
-                }
-              }
-              if(end.type === "station"){
-                for( var j = 0; j < end.connections.length; j++){
-                  if(end.connections && end.connections[j].id === shape.id){
-                    end.connections.splice(j, 1);
-                  }
-                }
-                  
-              }
-          }
-        } 
-      },
-      
-      modifyShape: function(id, x, y) { // would be better to switch that to an options {}
-        var l = this.shapes.length;
-        for (var i = l-1; i >= 0; i--) {
-          if (this.shapes[i].id === id) {
-            this.shapes[i].x = x;
-            this.shapes[i].y = y;
-            this.valid = false;
-            return;
-          }
-        }
-      },
-      
-      clear: function() {
-        this.ctx.clearRect(0, 0, this.width, this.height);
-      },
-      
-      draw: function() {
-        if (!this.valid) {
-          var ctx = this.ctx;
-          var shapes = this.shapes;
-          this.clear();
-          ctx.fillStyle = '#FFF';
-          ctx.fillRect(0, 0, this.width, this.height); // Draw white background so it's not transparent when downloaded'
-          // draw all shapes
-          var l = shapes.length;
-          
-          // want to draw connections first
-          for (var i = 0; i < l; i++) {
-            var shape = shapes[i];
-            if(shape === undefined){
-                console.error("something went wrong");
-                return;
-            }
-            if(shape.type == "connection"){
-              // We can skip the drawing of elements that have moved off the screen:
-              if (shape.x > this.width || shape.y > this.height ||
-                  shape.x + shape.w < 0 || shape.y + shape.h < 0){
-                continue;        
-              }
-                shapes[i].draw(ctx);
-            }
-          }
-          
-          // now draw the stations
-          for (var i = 0; i < l; i++) {
-            var shape = shapes[i];
-            if(shape === undefined){
-                console.error("something went wrong");
-                return;
-            }
-            if(shape.type == "station"){
-              // We can skip the drawing of elements that have moved off the screen:
-              if (shape.x > this.width || shape.y > this.height ||
-                  shape.x + shape.w < 0 || shape.y + shape.h < 0){
-                continue;        
-              }
-                shapes[i].draw(ctx);
-            }
-          }
-            
-          // draw selection
-          // right now this is just a stroke along the edge of the selected Shape
-          if (this.selection != null) {
-            ctx.strokeStyle = this.selectionColor;
-            ctx.lineWidth = this.selectionWidth;
-            var mySel = this.selection;
-            ctx.strokeRect(mySel.x,mySel.y,mySel.w,mySel.h);
-          }
-         
-          this.valid = true;
-        }
-      },
-      
-      getMouse: function(e) {
-        var element = this.canvas, offsetX = 0, offsetY = 0, mx, my;
-
-        if (element.offsetParent !== undefined) {
-          do {
-            offsetX += element.offsetLeft;
-            offsetY += element.offsetTop;
-          } while ((element = element.offsetParent));
-        }
-          
-        offsetX += this.stylePaddingLeft + this.styleBorderLeft + this.htmlLeft;
-        offsetY += this.stylePaddingTop + this.styleBorderTop + this.htmlTop;
-      
-        mx = e.pageX - offsetX;
-        my = e.pageY - offsetY;
-          
-        return {x: mx, y: my};
-      }
-       
-    };
-    
-    return CanvasState;
-    
+    // setInterval(function () {
+    //   this.draw();
+    // }, this.#interval);
   }
-);
+
+  get dragging() {
+    return this.#dragging;
+  }
+
+  set dragging(d) {
+    this.#dragging = d;
+  }
+
+  get canvas() {
+    return this.#canvas;
+  }
+
+  get shapes() {
+    return this.#shapes;
+  }
+
+  get selection() {
+    return this.#selection;
+  }
+
+  set selection(shape) {
+    this.#selection = shape;
+  }
+
+  get dragoffx() {
+    return this.#dragoffx;
+  }
+
+  set dragoffx(i) {
+    this.#dragoffx = i;
+  }
+
+  get dragoffy() {
+    return this.#dragoffy;
+  }
+
+  set dragoffy(i) {
+    this.#dragoffy = i;
+  }
+
+  get interval() {
+    return this.#interval;
+  }
+
+  addShape(shape) {
+    this.#shapes.push(shape);
+    this.#valid = false;
+    console.log("updated shapes array", this.#shapes);
+  }
+
+  removeShape(shape) {
+    const l = this.#shapes.length;
+    for (let i = l - 1; i >= 0; i--) {
+      if (this.#shapes[i].id === shape.id) {
+        this.#selection = null;
+        this.#valid = false;
+        this.#shapes.splice(i, 1);
+      }
+      if (this.#shapes[i] && this.#shapes[i].type === "connection") {
+        if (this.#shapes[i].includes(shape)) {
+          this.removeShape(this.#shapes[i]);
+        }
+      }
+      if (shape.type === "connection") {
+        // need to make sure we take it out of the station connection arrays
+        const start = shape.start;
+        const end = shape.end;
+        if (start.type === "station" && end.type === "station") {
+          return;
+        }
+        if (start.type === "station") {
+          for (let j = 0; j < start.connections.length; j++) {
+            if (start.connections && start.connections[j].id === shape.id) {
+              start.connections.splice(j, 1);
+            }
+          }
+        }
+        if (end.type === "station") {
+          for (let j = 0; j < end.connections.length; j++) {
+            if (end.connections && end.connections[j].id === shape.id) {
+              end.connections.splice(j, 1);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  modifyShape(id, x, y) {
+    // would be better to switch that to an options {}
+    const l = this.#shapes.length;
+    for (let i = l - 1; i >= 0; i--) {
+      if (this.#shapes[i].id === id) {
+        this.#shapes[i].x = x;
+        this.#shapes[i].y = y;
+        this.#valid = false;
+        return;
+      }
+    }
+  }
+
+  clear() {
+    this.#ctx.clearRect(0, 0, this.#width, this.#height);
+  }
+
+  draw() {
+    if (!this.#valid) {
+      console.log("draw!", this.#shapes);
+      const ctx = this.#ctx;
+      const shapes = this.#shapes;
+      this.clear();
+      ctx.fillStyle = "#FFF";
+      ctx.fillRect(0, 0, this.#width, this.#height); // Draw white background so it's not transparent when downloaded'
+      // draw all shapes
+      // TODO REFACTOR -- Why is the loop for connections and stations separate?
+      // want to draw connections first
+      for (const shape of shapes) {
+        if (shape === undefined) {
+          console.error("something went wrong");
+          return;
+        }
+        if (shape.type == "connection") {
+          // We can skip the drawing of elements that have moved off the screen:
+          if (
+            shape.x > this.#width ||
+            shape.y > this.#height ||
+            shape.x + shape.w < 0 ||
+            shape.y + shape.h < 0
+          ) {
+            continue;
+          }
+          shape.draw(ctx);
+        }
+      }
+
+      // now draw the stations
+      for (const shape of shapes) {
+        console.log("shape!", shape);
+        if (shape === undefined) {
+          console.error("something went wrong");
+          return;
+        }
+        if (shape.type == "station") {
+          // We can skip the drawing of elements that have moved off the screen:
+          if (
+            shape.x > this.#width ||
+            shape.y > this.#height ||
+            shape.x + shape.w < 0 ||
+            shape.y + shape.h < 0
+          ) {
+            console.log("f");
+            continue;
+          }
+          console.log("should draw shape");
+          shape.draw(ctx);
+        }
+      }
+
+      // draw selection
+      // right now this is just a stroke along the edge of the selected Shape
+      if (this.#selection != null) {
+        ctx.strokeStyle = this.#selectionColor;
+        ctx.lineWidth = this.#selectionWidth;
+        const mySel = this.#selection;
+        ctx.strokeRect(mySel.x, mySel.y, mySel.w, mySel.h);
+      }
+
+      this.#valid = true;
+    }
+  }
+
+  // TODO REFACTOR -- I suspect I shouldn't have this within the actual class
+  getMouse(e) {
+    const element = this.#canvas;
+    let offsetX = 0,
+      offsetY = 0,
+      mx,
+      my;
+
+    if (element.offsetParent !== undefined) {
+      // TODO I have no idea what the below does?
+      do {
+        offsetX += element.offsetLeft;
+        offsetY += element.offsetTop;
+      } while ((element = element.offsetParent));
+    }
+
+    offsetX += this.#stylePaddingLeft + this.#styleBorderLeft + this.#htmlLeft;
+    offsetY += this.#stylePaddingTop + this.#styleBorderTop + this.#htmlTop;
+
+    mx = e.pageX - offsetX;
+    my = e.pageY - offsetY;
+
+    return { x: mx, y: my };
+  }
+
+  getMouseOffset() {
+    const canvas = this.#canvas;
+    let offsetX = 0,
+      offsetY = 0,
+      mx,
+      my;
+
+    offsetX +=
+      canvas.offsetLeft +
+      this.#stylePaddingLeft +
+      this.#styleBorderLeft +
+      this.#htmlLeft;
+    offsetY +=
+      canvas.offsetTop +
+      this.#stylePaddingTop +
+      this.#styleBorderTop +
+      this.#htmlTop;
+
+    return { x: offsetX, y: offsetY };
+  }
+
+  // IDK what this was for, commenting out to see what happens
+  // if (document.defaultView && document.defaultView.getComputedStyle) {
+  //   this.stylePaddingLeft =
+  //     parseInt(
+  //       document.defaultView.getComputedStyle(canvas, null)["paddingLeft"],
+  //       10
+  //     ) || 0;
+  //   this.stylePaddingTop =
+  //     parseInt(
+  //       document.defaultView.getComputedStyle(canvas, null)["paddingTop"],
+  //       10
+  //     ) || 0;
+  //   this.styleBorderLeft =
+  //     parseInt(
+  //       document.defaultView.getComputedStyle(canvas, null)[
+  //         "borderLeftWidth"
+  //       ],
+  //       10
+  //     ) || 0;
+  //   this.styleBorderTop =
+  //     parseInt(
+  //       document.defaultView.getComputedStyle(canvas, null)["borderTopWidth"],
+  //       10
+  //     ) || 0;
+  // }
+}
