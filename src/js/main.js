@@ -1,6 +1,7 @@
 import * as Tools from "./toolbar";
 import CanvasState from "./state";
 
+// this class should probably be moved to its own file
 class CanvasMapper {
   #undoHistory = [];
   #redoHistory = [];
@@ -123,10 +124,24 @@ function setupListeners(cm) {
     // havent returned means we have failed to select anything.
     // If there was an object selected, we deselect it
     if (cm.canvas.selection) {
-      cm.canvas.selection.updateValues(); // make sure we get any changes that were made to properties
-      //$("#propdiv").empty(); // TODO
+      // make sure we get any changes that were made to properties
+      if (cm.canvas.selection.type === "station") {
+        cm.canvas.selection.name = document.getElementById("stNameInput").value;
+        cm.canvas.selection.xcoord = document.getElementById("stXInput").value;
+        cm.canvas.selection.ycoord = document.getElementById("stYInput").value;
+        cm.canvas.selection.zcoord = document.getElementById("stZInput").value;
+        cm.canvas.selection.fill =
+          document.getElementById("stColorField").value;
+      }
       cm.canvas.selection = null;
       cm.canvas.valid = false; // Need to clear the old selection border
+      document.getElementById("propdiv").innerHTML = "";
+      const props = document.getElementById("propdiv");
+      const template = document.querySelector("#emptyProps");
+      const clone = template.content.cloneNode(true);
+
+      props.innerHTML = "";
+      props.appendChild(clone);
     }
   }
 

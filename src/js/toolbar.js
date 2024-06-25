@@ -54,16 +54,26 @@ function handleAddStation(e, cm) {
     mouse.y - offset.y - 15,
     30,
     30,
-    "rgba(0,255,0,1)",
+    "#00FF00",
     cm.snum
   );
   cm.incrementSNum();
-  //UndoRedo.addToUndoHistory(new HistoryStep("add", newStation));
+  //UndoRedo.addToUndoHistory(new HistoryStep("add", newStation)); // TODO -- history
   cm.canvas.addShape(newStation);
   cm.canvas.selection = newStation;
 
   // then display options in properties
-  newStation.displayProperties(cm.canvas);
+  //newStation.displayProperties(cm.canvas);
+
+  // TODO -- likely want a util function for props to add the template/attach listeners
+  const props = document.getElementById("propdiv");
+  const template = document.querySelector("#stationProps");
+  const clone = template.content.cloneNode(true);
+
+  props.innerHTML = "";
+  // get the name/coords/color from station and update fields before appending
+  clone.querySelector("#stColorField").value = "#00FF00";
+  props.appendChild(clone);
 }
 
 export { handleAddStation, changeTool, deletePart };

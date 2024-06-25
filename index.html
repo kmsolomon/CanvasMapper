@@ -51,10 +51,35 @@
       </ul>
     </div>
     <div id="properties">
-      <h1>Properties</h1>
+      <h2>Properties</h2>
       <div id="propdiv">Nothing is selected</div>
     </div>
     <canvas id="workspace"></canvas>
+    <template id="emptyProps"> Nothing is selected </template>
+    <template id="stationProps">
+      <div id="stProperties">
+        <div class="input-group">
+          <label for="stNameInput">Name: </label>
+          <input id="stNameInput" type="text" />
+        </div>
+        <div class="input-group">
+          <label for="stXInput">X coordinate: </label>
+          <input id="stXInput" type="number" />
+        </div>
+        <div class="input-group">
+          <label for="stYInput">Y coordinate: </label>
+          <input id="stYInput" type="number" />
+        </div>
+        <div class="input-group">
+          <label for="stZInput">Z coordinate: </label>
+          <input id="stZInput" type="number" />
+        </div>
+        <div class="input-group">
+          <label for="stColorField">Color: </label>
+          <input id="stColorField" type="color" />
+        </div>
+      </div>
+    </template>
     <script type="module" src="/src/js/main.js"></script>
   </body>
 </html>

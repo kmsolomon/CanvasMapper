@@ -152,7 +152,7 @@ export default class Station {
     if (this.#name !== null) {
       ctx.font = "12px Courier";
       const metrics = ctx.measureText(this.#name);
-      const center = width / 2 - 15;
+      const center = metrics.width / 2 - 15;
       const halfStation = this.#w / 2;
       ctx.fillStyle = "#FFF";
       ctx.fillRect(
@@ -291,6 +291,47 @@ export default class Station {
     //   station.zcoord = z;
     //   state.valid = false;
     // });
+  }
+
+  get name() {
+    return this.#name;
+  }
+
+  set name(n) {
+    this.#name = n;
+  }
+
+  get xcoord() {
+    return this.#xcoord;
+  }
+
+  set xcoord(n) {
+    this.#xcoord = n;
+  }
+
+  get ycoord() {
+    return this.#ycoord;
+  }
+
+  set ycoord(n) {
+    this.#ycoord = n;
+  }
+
+  get zcoord() {
+    return this.#zcoord;
+  }
+
+  set zcoord(n) {
+    this.#zcoord = n;
+  }
+
+  get fill() {
+    return this.#zcoord;
+  }
+
+  set fill(n) {
+    // TODO check valid hex/rgb string
+    this.#fill = n;
   }
 
   updateValues() {

@@ -129,13 +129,21 @@ body {
   clear: both;
   float: left;
   font-size: 14px;
-  height: 300px;
+  min-height: 100px;
   margin-left: 40px;
   padding: 2px;
   width: 250px;
 }
 
-#properties h1 {
+#properties h2 {
   font-size: 14px;
   font-weight: 600;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 5px 25px;
+  gap: 5px;
 }

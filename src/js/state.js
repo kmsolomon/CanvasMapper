@@ -246,9 +246,7 @@ export default class CanvasState {
   getMouseOffset() {
     const canvas = this.#canvas;
     let offsetX = 0,
-      offsetY = 0,
-      mx,
-      my;
+      offsetY = 0;
 
     offsetX +=
       canvas.offsetLeft +
