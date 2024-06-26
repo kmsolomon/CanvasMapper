@@ -326,7 +326,7 @@ export default class Station {
   }
 
   get fill() {
-    return this.#zcoord;
+    return this.#fill;
   }
 
   set fill(n) {

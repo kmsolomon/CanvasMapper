@@ -42,6 +42,24 @@ class CanvasMapper {
   incrementSNum() {
     this.#snum += 1;
   }
+
+  displayProperties() {
+    if (this.#canvas.selection && this.#canvas.selection.type === "station") {
+      const props = document.getElementById("propdiv");
+      const template = document.querySelector("#stationProps");
+      const clone = template.content.cloneNode(true);
+      const selectedShape = this.#canvas.selection;
+
+      props.innerHTML = "";
+      // get the name/coords/color from station and update fields before appending
+      clone.querySelector("#stColorField").value = selectedShape.fill;
+      clone.querySelector("#stNameInput").value = selectedShape.name;
+      clone.querySelector("#stXInput").value = selectedShape.xcoord;
+      clone.querySelector("#stYInput").value = selectedShape.ycoord;
+      clone.querySelector("#stZInput").value = selectedShape.zcoord;
+      props.appendChild(clone);
+    }
+  }
 }
 
 function setupListeners(cm) {
@@ -105,18 +123,19 @@ function setupListeners(cm) {
   function handleCanvasMouseDown(e) {
     console.log("mouse down");
     const tool = cm.activeTool;
-    const mouse = { x: e.pageX, y: e.pageY };
+    const offset = cm.canvas.getMouseOffset();
+    const mouse = { x: e.pageX - offset.x, y: e.pageY - offset.y };
     const shapes = cm.canvas.shapes;
     for (let i = shapes.length - 1; i >= 0; i--) {
       if (shapes[i].contains(mouse.x, mouse.y)) {
-        const mySel = shapes[i];
-        cm.canvas.selection = mySel;
+        const selectedShape = shapes[i];
+        cm.canvas.selection = selectedShape;
         // Keep track of where in the object we clicked
         // so we can move it smoothly (see mousemove)
-        cm.canvas.dragoffx = mouse.x - mySel.x;
-        cm.canvas.dragoffy = mouse.y - mySel.y;
-        tool.mouseDown(e, myState);
-        myState.valid = false;
+        cm.canvas.dragoffx = mouse.x - selectedShape.x;
+        cm.canvas.dragoffy = mouse.y - selectedShape.y;
+        Tools.handleSelectMouseDown(e, cm);
+        cm.canvas.valid = false; // force redraw
         return;
       }
     }
@@ -125,6 +144,7 @@ function setupListeners(cm) {
     // If there was an object selected, we deselect it
     if (cm.canvas.selection) {
       // make sure we get any changes that were made to properties
+      // TODO -- these should happen on enter/focus out
       if (cm.canvas.selection.type === "station") {
         cm.canvas.selection.name = document.getElementById("stNameInput").value;
         cm.canvas.selection.xcoord = document.getElementById("stXInput").value;
@@ -200,8 +220,15 @@ function setupListeners(cm) {
 
   function handleCanvasClick(e) {
     const tool = cm.activeTool;
-    if (tool === "stationBtn") {
-      Tools.handleAddStation(e, cm);
+    switch (tool) {
+      case "stationBtn":
+        Tools.handleAddStation(e, cm);
+        break;
+      case "selectBtn":
+        Tools.handleSelectClick(e, cm);
+        break;
+      default:
+        break;
     }
   }
 

@@ -76,4 +76,31 @@ function handleAddStation(e, cm) {
   props.appendChild(clone);
 }
 
-export { handleAddStation, changeTool, deletePart };
+// TODO might get rid of this
+function handleSelectClick(e, cm) {
+  // update selection?
+  // show properties
+  cm.displayProperties();
+}
+
+function handleSelectMouseDown(e, cm) {
+  const selection = cm.canvas.selection;
+  cm.displayProperties();
+  cm.canvas.dragging = true;
+  // TODO history
+  // UndoRedo.addToUndoHistory(
+  //   new HistoryStep("move", {
+  //     id: selection.id,
+  //     x: selection.x,
+  //     y: selection.y,
+  //   })
+  // );
+}
+
+export {
+  handleAddStation,
+  handleSelectClick,
+  handleSelectMouseDown,
+  changeTool,
+  deletePart,
+};
