@@ -134,8 +134,8 @@ function setupListeners(cm) {
         // so we can move it smoothly (see mousemove)
         cm.canvas.dragoffx = mouse.x - selectedShape.x;
         cm.canvas.dragoffy = mouse.y - selectedShape.y;
-        Tools.handleSelectMouseDown(e, cm);
         cm.canvas.valid = false; // force redraw
+        Tools.handleSelectMouseDown(e, cm);
         return;
       }
     }
@@ -166,7 +166,8 @@ function setupListeners(cm) {
   }
 
   function handleCanvasMouseMove(e) {
-    const mouse = { x: e.pageX, y: e.pageY };
+    const offset = cm.canvas.getMouseOffset();
+    const mouse = { x: e.pageX - offset.x, y: e.pageY - offset.y };
     if (cm.canvas.dragging) {
       // var mouse = myState.getMouse(e);
       // Don't want to drag the object by its top-left corner, that's what offset is for

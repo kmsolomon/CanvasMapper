@@ -334,6 +334,22 @@ export default class Station {
     this.#fill = n;
   }
 
+  get x() {
+    return this.#x;
+  }
+
+  set x(n) {
+    this.#x = n;
+  }
+
+  get y() {
+    return this.#y;
+  }
+
+  set y(n) {
+    this.#y = n;
+  }
+
   updateValues() {
     console.log("todo update values");
     // this.name = $("#stNameInput").val();

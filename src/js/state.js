@@ -91,6 +91,14 @@ export default class CanvasState {
     return this.#interval;
   }
 
+  get valid() {
+    return this.#valid;
+  }
+
+  set valid(b) {
+    this.#valid = b;
+  }
+
   addShape(shape) {
     this.#shapes.push(shape);
     this.#valid = false;
@@ -154,7 +162,7 @@ export default class CanvasState {
 
   draw() {
     if (!this.#valid) {
-      console.log("draw!", this.#shapes);
+      console.log("redraw!", this.#shapes);
       const ctx = this.#ctx;
       const shapes = this.#shapes;
       this.clear();

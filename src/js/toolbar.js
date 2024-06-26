@@ -62,18 +62,7 @@ function handleAddStation(e, cm) {
   cm.canvas.addShape(newStation);
   cm.canvas.selection = newStation;
 
-  // then display options in properties
-  //newStation.displayProperties(cm.canvas);
-
-  // TODO -- likely want a util function for props to add the template/attach listeners
-  const props = document.getElementById("propdiv");
-  const template = document.querySelector("#stationProps");
-  const clone = template.content.cloneNode(true);
-
-  props.innerHTML = "";
-  // get the name/coords/color from station and update fields before appending
-  clone.querySelector("#stColorField").value = "#00FF00";
-  props.appendChild(clone);
+  cm.displayProperties();
 }
 
 // TODO might get rid of this
@@ -84,6 +73,7 @@ function handleSelectClick(e, cm) {
 }
 
 function handleSelectMouseDown(e, cm) {
+  console.log("do the thing");
   const selection = cm.canvas.selection;
   cm.displayProperties();
   cm.canvas.dragging = true;
