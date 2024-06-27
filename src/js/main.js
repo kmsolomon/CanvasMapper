@@ -1,5 +1,6 @@
 import * as Tools from "./toolbar";
 import CanvasState from "./state";
+import Connection from "./connection";
 
 // this class should probably be moved to its own file
 class CanvasMapper {
@@ -17,6 +18,7 @@ class CanvasMapper {
     this.#maxHistory = maxHistory;
     this.#canvas = canvas;
     this.incrementSNum = this.incrementSNum.bind(this);
+    this.incrementCNum = this.incrementCNum.bind(this);
   }
 
   set activeTool(name) {
@@ -39,8 +41,16 @@ class CanvasMapper {
     return this.#snum;
   }
 
+  get cnum() {
+    return this.#cnum;
+  }
+
   incrementSNum() {
     this.#snum += 1;
+  }
+
+  incrementCNum() {
+    this.#cnum += 1;
   }
 
   displayProperties() {
@@ -59,6 +69,16 @@ class CanvasMapper {
       clone.querySelector("#stZInput").value = selectedShape.zcoord;
       props.appendChild(clone);
     }
+  }
+
+  clearDisplayProps() {
+    document.getElementById("propdiv").innerHTML = "";
+    const props = document.getElementById("propdiv");
+    const template = document.querySelector("#emptyProps");
+    const clone = template.content.cloneNode(true);
+
+    props.innerHTML = "";
+    props.appendChild(clone);
   }
 }
 
@@ -121,28 +141,30 @@ function setupListeners(cm) {
   );
 
   function handleCanvasMouseDown(e) {
-    console.log("mouse down");
     const tool = cm.activeTool;
     const offset = cm.canvas.getMouseOffset();
     const mouse = { x: e.pageX - offset.x, y: e.pageY - offset.y };
     const shapes = cm.canvas.shapes;
-    for (let i = shapes.length - 1; i >= 0; i--) {
-      if (shapes[i].contains(mouse.x, mouse.y)) {
-        const selectedShape = shapes[i];
-        cm.canvas.selection = selectedShape;
-        // Keep track of where in the object we clicked
-        // so we can move it smoothly (see mousemove)
-        cm.canvas.dragoffx = mouse.x - selectedShape.x;
-        cm.canvas.dragoffy = mouse.y - selectedShape.y;
-        cm.canvas.valid = false; // force redraw
-        Tools.handleSelectMouseDown(e, cm);
-        return;
+    let validSelection = false;
+
+    if (tool === "selectBtn" || tool === "connectionBtn") {
+      console.log("this shapes are:", shapes);
+      for (let i = shapes.length - 1; i >= 0; i--) {
+        if (shapes[i].contains(mouse.x, mouse.y)) {
+          const selectedShape = shapes[i];
+
+          cm.canvas.selection = selectedShape;
+          validSelection = true;
+          // Keep track of where in the object we clicked
+          // so we can move it smoothly (see mousemove)
+          cm.canvas.dragoffx = mouse.x - selectedShape.x;
+          cm.canvas.dragoffy = mouse.y - selectedShape.y;
+          break;
+        }
       }
     }
 
-    // havent returned means we have failed to select anything.
-    // If there was an object selected, we deselect it
-    if (cm.canvas.selection) {
+    if (!validSelection && cm.canvas.selection) {
       // make sure we get any changes that were made to properties
       // TODO -- these should happen on enter/focus out
       if (cm.canvas.selection.type === "station") {
@@ -155,20 +177,30 @@ function setupListeners(cm) {
       }
       cm.canvas.selection = null;
       cm.canvas.valid = false; // Need to clear the old selection border
-      document.getElementById("propdiv").innerHTML = "";
-      const props = document.getElementById("propdiv");
-      const template = document.querySelector("#emptyProps");
-      const clone = template.content.cloneNode(true);
+      cm.clearDisplayProps();
+    }
 
-      props.innerHTML = "";
-      props.appendChild(clone);
+    if (tool === "selectBtn") {
+      cm.displayProperties();
+      cm.canvas.valid = false; // force redraw
+      Tools.handleSelectMouseDown(e, cm);
+    } else if (tool === "connectionBtn") {
+      console.log("mouse down connecting");
+      const selection = cm.canvas.selection; // TODO, probably want to select the station if you start a line on the station
+      const line = new Connection(selection, mouse, cm.cnum);
+      cm.incrementCNum();
+      cm.canvas.connecting = true;
+      selection.connections.push(line);
+      cm.canvas.activeLine = line;
+      cm.canvas.shapes.push(line);
     }
   }
 
   function handleCanvasMouseMove(e) {
     const offset = cm.canvas.getMouseOffset();
     const mouse = { x: e.pageX - offset.x, y: e.pageY - offset.y };
-    if (cm.canvas.dragging) {
+    if (cm.canvas.dragging && cm.canvas.selection) {
+      console.log("dragging for some reason");
       // var mouse = myState.getMouse(e);
       // Don't want to drag the object by its top-left corner, that's what offset is for
       cm.canvas.selection.x = mouse.x - cm.canvas.dragoffx;
@@ -176,6 +208,7 @@ function setupListeners(cm) {
       cm.canvas.valid = false; // Something's dragging so we must redraw
     }
     if (cm.canvas.connecting) {
+      console.log("connecting?");
       // var mouse = cm.canvas.getMouse(e);
       cm.canvas.activeLine.end.x = mouse.x;
       cm.canvas.activeLine.end.y = mouse.y;
@@ -191,7 +224,9 @@ function setupListeners(cm) {
       // if not, remove the line
       let validConnection = false;
       //var mouse = myState.getMouse(e);
-      const mouse = { x: e.pageX, y: e.pageY };
+      // TODO - 3rd time we have the offset then mouse thing. just put it in a function
+      const offset = cm.canvas.getMouseOffset();
+      const mouse = { x: e.pageX - offset.x, y: e.pageY - offset.y };
       const shapes = cm.canvas.shapes;
       for (let i = shapes.length - 1; i >= 0; i--) {
         if (
@@ -203,9 +238,9 @@ function setupListeners(cm) {
           validConnection = true;
           cm.canvas.activeLine.end = shapes[i];
           shapes[i].connections.push(cm.canvas.activeLine);
-          UndoRedo.addToUndoHistory(
-            new HistoryStep("add", cm.canvas.activeLine)
-          );
+          // UndoRedo.addToUndoHistory(
+          //   new HistoryStep("add", cm.canvas.activeLine)
+          // );
         }
       }
       if (!validConnection) {

@@ -138,14 +138,14 @@ export default class Station {
   }
 
   draw(ctx) {
-    console.log(
-      "draw station!",
-      this.#x,
-      this.#y,
-      this.#w,
-      this.#h,
-      this.#fill
-    );
+    // console.log(
+    //   "draw station!",
+    //   this.#x,
+    //   this.#y,
+    //   this.#w,
+    //   this.#h,
+    //   this.#fill
+    // );
     ctx.fillStyle = this.#fill;
     ctx.fillRect(this.#x, this.#y, this.#w, this.#h);
 
@@ -348,6 +348,14 @@ export default class Station {
 
   set y(n) {
     this.#y = n;
+  }
+
+  get id() {
+    return this.#id;
+  }
+
+  get connections() {
+    return this.#connections;
   }
 
   updateValues() {

@@ -73,7 +73,6 @@ function handleSelectClick(e, cm) {
 }
 
 function handleSelectMouseDown(e, cm) {
-  console.log("do the thing");
   const selection = cm.canvas.selection;
   cm.displayProperties();
   cm.canvas.dragging = true;

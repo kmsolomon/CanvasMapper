@@ -99,6 +99,22 @@ export default class CanvasState {
     this.#valid = b;
   }
 
+  get activeLine() {
+    return this.#activeLine;
+  }
+
+  set activeLine(l) {
+    this.#activeLine = l;
+  }
+
+  get connecting() {
+    return this.#connecting;
+  }
+
+  set connecting(b) {
+    this.#connecting = b;
+  }
+
   addShape(shape) {
     this.#shapes.push(shape);
     this.#valid = false;
