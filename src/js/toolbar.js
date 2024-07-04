@@ -38,11 +38,12 @@ function changeTool(btn, cm) {
 }
 
 // Delete the Station or Connection
-function deletePart(e) {
-  if (state.selection) {
-    UndoRedo.addToUndoHistory(new HistoryStep("delete", state.selection));
-    state.removeShape(state.selection);
-    $("#propdiv").empty();
+function deletePart(e, cm) {
+  if (cm.canvas.selection) {
+    // TODO - history
+    //UndoRedo.addToUndoHistory(new HistoryStep("delete", state.selection));
+    cm.canvas.removeShape(cm.canvas.selection);
+    cm.clearDisplayProps();
   }
 }
 

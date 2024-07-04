@@ -100,7 +100,7 @@ function setupListeners(cm) {
     });
   document.getElementById("deleteBtn").addEventListener("click", function (e) {
     console.log("delete btn");
-    // Tools.deletePart(e);
+    Tools.deletePart(e, cm);
   });
   document.getElementById("undoBtn").addEventListener("click", function (e) {
     console.log("undo btn");

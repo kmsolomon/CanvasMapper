@@ -83,6 +83,10 @@ export default class Connection {
     this.#end = e;
   }
 
+  get id() {
+    return this.#id;
+  }
+
   draw(ctx) {
     ctx.strokeStyle = this.#color;
     ctx.lineWidth = this.#width;

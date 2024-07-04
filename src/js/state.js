@@ -127,28 +127,25 @@ export default class CanvasState {
       if (this.#shapes[i].id === shape.id) {
         this.#selection = null;
         this.#valid = false;
-        this.#shapes.splice(i, 1);
+        this.#shapes = this.#shapes.filter((s) => s.id !== shape.id);
       }
-      if (this.#shapes[i] && this.#shapes[i].type === "connection") {
-        if (this.#shapes[i].includes(shape)) {
-          this.removeShape(this.#shapes[i]);
-        }
-      }
-      if (shape.type === "connection") {
+      if (
+        shape.type === "station" &&
+        this.#shapes[i]?.type === "connection" &&
+        this.#shapes[i].includes(shape)
+      ) {
+        this.removeShape(this.#shapes[i]);
+      } else if (shape.type === "connection") {
         // need to make sure we take it out of the station connection arrays
         const start = shape.start;
         const end = shape.end;
-        if (start.type === "station" && end.type === "station") {
-          return;
-        }
-        if (start.type === "station") {
+        if (start.type === "station" && end.type !== "station") {
           for (let j = 0; j < start.connections.length; j++) {
             if (start.connections && start.connections[j].id === shape.id) {
               start.connections.splice(j, 1);
             }
           }
-        }
-        if (end.type === "station") {
+        } else if (end.type === "station" && start.type !== "station") {
           for (let j = 0; j < end.connections.length; j++) {
             if (end.connections && end.connections[j].id === shape.id) {
               end.connections.splice(j, 1);
