@@ -1,32 +1,9 @@
 import Station from "./station";
 import HistoryStep from "./historystep";
 
-// function activeTool() {
-//   var active = document.querySelector(".active");
-//   if (active.id) {
-//     switch (active.id) {
-//       case "stationBtn":
-//         return AddStation;
-//         break;
-//       case "selectBtn":
-//         return SelectTool;
-//         break;
-//       case "connectionBtn":
-//         return AddConnection;
-//         break;
-//       default:
-//         break;
-//     }
-//   } else {
-//     console.warn("There was an error getting the active tool");
-//     return "selection";
-//   }
-// }
-
 function changeTool(btn, cm) {
   // remove active from others buttons, apply active to the clicked tool
   if (btn !== cm.activeTool) {
-    console.log(`should change to ${btn}!`);
     const prev = document.getElementById(cm.activeTool);
     prev.classList.toggle("active");
     prev.setAttribute("aria-pressed", false);
@@ -75,15 +52,17 @@ function handleSelectClick(e, cm) {
 
 function handleSelectMouseDown(e, cm) {
   const selection = cm.canvas.selection;
+  if (selection) {
+    cm.canvas.dragging = true;
+    cm.addToUndoHistory(
+      new HistoryStep("move", {
+        id: selection.id,
+        x: selection.x,
+        y: selection.y,
+      })
+    );
+  }
   cm.displayProperties();
-  cm.canvas.dragging = true;
-  cm.addToUndoHistory(
-    new HistoryStep("move", {
-      id: selection.id,
-      x: selection.x,
-      y: selection.y,
-    })
-  );
 }
 
 export {

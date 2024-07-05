@@ -118,7 +118,6 @@ export default class CanvasState {
   addShape(shape) {
     this.#shapes.push(shape);
     this.#valid = false;
-    console.log("updated shapes array", this.#shapes);
   }
 
   removeShape(shape) {
@@ -175,12 +174,11 @@ export default class CanvasState {
 
   draw() {
     if (!this.#valid) {
-      console.log("redraw!", this.#shapes);
       const ctx = this.#ctx;
       const shapes = this.#shapes;
       this.clear();
       ctx.fillStyle = "#FFF";
-      ctx.fillRect(0, 0, this.#width, this.#height); // Draw white background so it's not transparent when downloaded'
+      ctx.fillRect(0, 0, this.#width, this.#height); // Draw white background so it's not transparent when downloaded
       // draw all shapes
       // TODO REFACTOR -- Why is the loop for connections and stations separate?
       // want to draw connections first
@@ -205,29 +203,28 @@ export default class CanvasState {
 
       // now draw the stations
       for (const shape of shapes) {
-        console.log("shape!", shape);
         if (shape === undefined) {
-          console.error("something went wrong");
+          console.error("Something went wrong while drawing");
           return;
         }
         if (shape.type == "station") {
           // We can skip the drawing of elements that have moved off the screen:
+          // TODO -- could clean this up
           if (
             shape.x > this.#width ||
             shape.y > this.#height ||
             shape.x + shape.w < 0 ||
             shape.y + shape.h < 0
           ) {
-            console.log("f");
             continue;
           }
-          console.log("should draw shape");
           shape.draw(ctx);
         }
       }
 
       // draw selection
       // right now this is just a stroke along the edge of the selected Shape
+      // TODO this part isn't working, need to fix
       if (this.#selection != null) {
         ctx.strokeStyle = this.#selectionColor;
         ctx.lineWidth = this.#selectionWidth;
