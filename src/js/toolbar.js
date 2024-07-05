@@ -1,26 +1,27 @@
 import Station from "./station";
+import HistoryStep from "./historystep";
 
-function activeTool() {
-  var active = document.querySelector(".active");
-  if (active.id) {
-    switch (active.id) {
-      case "stationBtn":
-        return AddStation;
-        break;
-      case "selectBtn":
-        return SelectTool;
-        break;
-      case "connectionBtn":
-        return AddConnection;
-        break;
-      default:
-        break;
-    }
-  } else {
-    console.warn("There was an error getting the active tool");
-    return "selection";
-  }
-}
+// function activeTool() {
+//   var active = document.querySelector(".active");
+//   if (active.id) {
+//     switch (active.id) {
+//       case "stationBtn":
+//         return AddStation;
+//         break;
+//       case "selectBtn":
+//         return SelectTool;
+//         break;
+//       case "connectionBtn":
+//         return AddConnection;
+//         break;
+//       default:
+//         break;
+//     }
+//   } else {
+//     console.warn("There was an error getting the active tool");
+//     return "selection";
+//   }
+// }
 
 function changeTool(btn, cm) {
   // remove active from others buttons, apply active to the clicked tool
@@ -40,15 +41,14 @@ function changeTool(btn, cm) {
 // Delete the Station or Connection
 function deletePart(e, cm) {
   if (cm.canvas.selection) {
-    // TODO - history
-    //UndoRedo.addToUndoHistory(new HistoryStep("delete", state.selection));
+    cm.addToUndoHistory(new HistoryStep("delete", cm.canvas.selection));
     cm.canvas.removeShape(cm.canvas.selection);
     cm.clearDisplayProps();
   }
 }
 
 function handleAddStation(e, cm) {
-  const mouse = { x: e.pageX, y: e.pageY }; // TODO -- offset
+  const mouse = { x: e.pageX, y: e.pageY }; // TODO -- offset?
   const offset = cm.canvas.getMouseOffset();
   const newStation = new Station(
     mouse.x - offset.x - 15,
@@ -59,7 +59,7 @@ function handleAddStation(e, cm) {
     cm.snum
   );
   cm.incrementSNum();
-  //UndoRedo.addToUndoHistory(new HistoryStep("add", newStation)); // TODO -- history
+  cm.addToUndoHistory(new HistoryStep("add", newStation));
   cm.canvas.addShape(newStation);
   cm.canvas.selection = newStation;
 
@@ -77,14 +77,13 @@ function handleSelectMouseDown(e, cm) {
   const selection = cm.canvas.selection;
   cm.displayProperties();
   cm.canvas.dragging = true;
-  // TODO history
-  // UndoRedo.addToUndoHistory(
-  //   new HistoryStep("move", {
-  //     id: selection.id,
-  //     x: selection.x,
-  //     y: selection.y,
-  //   })
-  // );
+  cm.addToUndoHistory(
+    new HistoryStep("move", {
+      id: selection.id,
+      x: selection.x,
+      y: selection.y,
+    })
+  );
 }
 
 export {

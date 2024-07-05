@@ -19,6 +19,8 @@ class CanvasMapper {
     this.#canvas = canvas;
     this.incrementSNum = this.incrementSNum.bind(this);
     this.incrementCNum = this.incrementCNum.bind(this);
+    this.undo = this.undo.bind(this);
+    this.redo = this.redo.bind(this);
   }
 
   set activeTool(name) {
@@ -80,6 +82,89 @@ class CanvasMapper {
     props.innerHTML = "";
     props.appendChild(clone);
   }
+
+  addToUndoHistory(hs) {
+    if (this.#uStep === this.#maxHistory) {
+      this.#undoHistory.shift();
+      this.#uStep--;
+    }
+    this.#uStep++;
+    this.#undoHistory.push(hs);
+    // There's a new step so forget all the old redo items
+    this.#redoHistory = [];
+    this.#rStep = 0;
+  }
+
+  undo() {
+    if (this.#uStep > 0) {
+      this.#uStep--;
+      const u = this.#undoHistory.pop();
+      if (u === undefined) {
+        console.error("The last undo history object was undefined.");
+        return;
+      }
+      console.log(u);
+      this.#rStep++;
+      if (u.type === "move") {
+        const l = this.#canvas.shapes.length;
+        const currentSpot = {};
+        for (let i = l - 1; i >= 0; i--) {
+          if (this.#canvas.shapes[i].id === u.object.id) {
+            currentSpot.x = this.#canvas.shapes[i].x;
+            currentSpot.y = this.#canvas.shapes[i].y;
+          }
+        }
+        this.#canvas.modifyShape(u.object.id, u.object.x, u.object.y);
+        u.object.x = currentSpot.x;
+        u.object.y = currentSpot.y;
+      }
+      this.#redoHistory.push(u);
+
+      if (u.type === "add") {
+        this.#canvas.removeShape(u.object);
+      } else if (u.type === "delete") {
+        this.#canvas.addShape(u.object);
+        const l = u.object.connections.length;
+        for (let i = 0; i < l; i++) {
+          this.#canvas.addShape(u.object.connections[i]);
+        }
+      }
+    }
+  }
+
+  redo() {
+    if (this.#rStep > 0) {
+      this.#rStep--;
+      const r = this.#redoHistory.pop();
+      if (r === undefined) {
+        console.error("The last redo history object was undefined.");
+        return;
+      }
+      this.#uStep++;
+      if (r.type === "move") {
+        const l = this.#canvas.shapes.length;
+        const currentSpot = {};
+        for (let i = l - 1; i >= 0; i--) {
+          if (this.#canvas.shapes[i].id === r.object.id) {
+            currentSpot.x = this.#canvas.shapes[i].x;
+            currentSpot.y = this.#canvas.shapes[i].y;
+          }
+        }
+        this.#canvas.modifyShape(r.object.id, r.object.x, r.object.y);
+        r.object.x = currentSpot.x;
+        r.object.y = currentSpot.y;
+      }
+      this.#undoHistory.push(r);
+      if (r.type === "add") {
+        this.#canvas.addShape(r.object);
+      } else if (r.type === "delete") {
+        this.#canvas.removeShape(r.object);
+        // } else if (r.type === "connection") {
+        //   // TODO
+        //   console.log("not implemented");
+      }
+    }
+  }
 }
 
 function setupListeners(cm) {
@@ -104,11 +189,11 @@ function setupListeners(cm) {
   });
   document.getElementById("undoBtn").addEventListener("click", function (e) {
     console.log("undo btn");
-    // UndoRedo.undo(e);
+    cm.undo();
   });
   document.getElementById("redoBtn").addEventListener("click", function (e) {
     console.log("redo btn");
-    // UndoRedo.redo(e);
+    cm.redo();
   });
   document
     .getElementById("downloadPNG")
