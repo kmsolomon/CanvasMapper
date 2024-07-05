@@ -2,6 +2,7 @@ import * as Tools from "./toolbar";
 import CanvasState from "./state";
 import Connection from "./connection";
 import CanvasMapper from "./canvasmapper";
+import { exportAsPNG } from "./export";
 
 function setupListeners(cm) {
   /***  Buttons  ***/
@@ -29,7 +30,7 @@ function setupListeners(cm) {
     .getElementById("downloadPNG")
     .addEventListener("click", function (e) {
       console.log("download png");
-      // Export.exportAsPNG();
+      exportAsPNG();
     });
   document
     .getElementById("downloadJSON")
@@ -146,6 +147,7 @@ function setupListeners(cm) {
           validConnection = true;
           cm.canvas.activeLine.end = shapes[i];
           shapes[i].connections.push(cm.canvas.activeLine);
+          // TODO - undo/redo for connections
           // UndoRedo.addToUndoHistory(
           //   new HistoryStep("add", cm.canvas.activeLine)
           // );
