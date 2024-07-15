@@ -20,9 +20,27 @@ export default class Station {
     this.#w = w;
     this.#h = h;
     this.#fill = fill;
-    this.#id = `s${snum}`;
+    this.#id = snum;
     this.draw = this.draw.bind(this);
     this.contains = this.contains.bind(this);
+    this.toJSON = this.toJSON.bind(this);
+  }
+
+  static clone(original) {
+    const cloned = new Station(
+      original.x,
+      original.y,
+      original.w,
+      original.h,
+      original.fill,
+      original.id
+    );
+    cloned.name = original.name;
+    cloned.xcoord = original.xcoord;
+    cloned.ycoord = original.ycoord;
+    cloned.zcoord = original.zcoord;
+    cloned.connections = [...original.connections];
+    return cloned;
   }
 
   draw(ctx) {
@@ -57,6 +75,26 @@ export default class Station {
       this.#y <= my &&
       this.#y + this.#h >= my
     );
+  }
+
+  toJSON() {
+    const obj = {
+      id: this.#id,
+      name: this.#name,
+      type: "station",
+      x: this.#x,
+      y: this.#y,
+      w: this.#w,
+      h: this.#h,
+      fill: this.#fill,
+      xcoord: this.#xcoord,
+      ycoord: this.#ycoord,
+      zcoord: this.#zcoord,
+      smallPadding: this.#smallPadding,
+      largePadding: this.#largePadding,
+      connections: this.#connections,
+    };
+    return JSON.stringify(obj);
   }
 
   get name() {
@@ -120,8 +158,20 @@ export default class Station {
     return this.#id;
   }
 
+  get w() {
+    return this.#w;
+  }
+
+  get h() {
+    return this.#h;
+  }
+
   get connections() {
     return this.#connections;
+  }
+
+  set connections(c) {
+    this.#connections = c;
   }
 
   updateValues() {

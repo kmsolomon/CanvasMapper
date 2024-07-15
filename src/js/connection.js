@@ -11,15 +11,32 @@ export default class Connection {
     this.#end = end;
     this.#color = color;
     this.#width = width;
-    this.#id = `c${cnum}`;
+    this.#id = cnum;
 
     this.draw = this.draw.bind(this);
     this.contains = this.contains.bind(this);
     this.includes = this.includes.bind(this);
+    this.toJSON = this.toJSON.bind(this);
+  }
+
+  static clone(original) {
+    const cloned = new Connection(
+      original.start,
+      original.end,
+      original.id,
+      original.cnum,
+      original.color,
+      original.width
+    );
+    return cloned;
   }
 
   get start() {
     return this.#start;
+  }
+
+  set start(s) {
+    this.#start = s;
   }
 
   get end() {
@@ -64,5 +81,18 @@ export default class Connection {
 
   includes(s) {
     return this.#end.id === s.id || this.#start.id === s.id;
+  }
+
+  toJSON() {
+    const obj = {
+      id: this.#id,
+      type: this.type,
+      start: this.#start,
+      end: this.#end,
+      color: this.#color,
+      width: this.#width,
+    };
+
+    return JSON.stringify(obj);
   }
 }

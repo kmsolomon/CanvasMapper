@@ -2,7 +2,7 @@ import * as Tools from "./toolbar";
 import CanvasState from "./state";
 import Connection from "./connection";
 import CanvasMapper from "./canvasmapper";
-import { exportAsPNG } from "./export";
+import { exportAsJSON, exportAsPNG } from "./export";
 
 function setupListeners(cm) {
   /***  Buttons  ***/
@@ -26,17 +26,14 @@ function setupListeners(cm) {
   document.getElementById("redoBtn").addEventListener("click", function () {
     cm.redo();
   });
-  document
-    .getElementById("downloadPNG")
-    .addEventListener("click", function (e) {
-      console.log("download png");
-      exportAsPNG();
-    });
+  document.getElementById("downloadPNG").addEventListener("click", function () {
+    exportAsPNG();
+  });
   document
     .getElementById("downloadJSON")
-    .addEventListener("click", function (e) {
+    .addEventListener("click", function () {
       console.log("download json");
-      // Export.exportAsJSON(state); // TODO -- state not global maybe
+      exportAsJSON(cm.canvas);
     });
   document.getElementById("importFile").addEventListener("click", function (e) {
     console.log("import!");
@@ -101,7 +98,7 @@ function setupListeners(cm) {
       Tools.handleSelectMouseDown(e, cm);
     } else if (tool === "connectionBtn") {
       const selection = cm.canvas.selection; // TODO, probably want to select the station if you start a line on the station
-      const line = new Connection(selection, mouse, cm.cnum);
+      const line = new Connection(selection, mouse, `c${cm.cnum}`);
       cm.incrementCNum();
       cm.canvas.connecting = true;
       selection.connections.push(line);

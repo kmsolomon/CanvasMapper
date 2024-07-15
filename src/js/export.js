@@ -1,84 +1,5 @@
-// define(["jquery", "fileSaver", "canvastoBlob"], function (
-//   $,
-//   FileSaver,
-//   CanvastoBlob
-// ) {
-//   return {
-//     exportAsPNG: function () {
-//       var canvas = document.getElementById("workspace"),
-//         ctx = canvas.getContext("2d");
-
-//       canvas.toBlob(function (blob) {
-//         saveAs(blob, "canvasMap.png");
-//       });
-//     },
-
-//     exportAsJSON: function (state) {
-//       var shapes = state.shapes;
-
-//       function replaceConnections(connections, shape) {
-//         var results = {
-//           connectIds: [],
-//           connections: [],
-//         };
-
-//         // for each of the connections, we want to add the id to an array
-//         // and also replace the start and end with the station ids
-//         for (var i = 0; i < shape.connections.length; i++) {
-//           var c = shape.connections[i];
-//           var copy = {
-//             start: c.start.id,
-//             end: c.end.id,
-//             color: c.color,
-//             width: c.width,
-//             id: c.id,
-//             type: "connection",
-//           };
-//           results.connectIds.push(copy.id);
-//           results.connections.push(copy);
-//         }
-
-//         return results;
-//       }
-
-//       var stations = [];
-//       var connections = [];
-//       var result = null;
-//       for (var i = 0; i < shapes.length; i++) {
-//         if (shapes[i].type === "station") {
-//           result = replaceConnections(connections, shapes[i]);
-//           shapes[i].connections = result.connectIds;
-//           stations.push(shapes[i]);
-
-//           // check to make sure new result.connections not already found
-//           // if new add to connections
-//           for (var j = 0; j < result.connections.length; j++) {
-//             // for each result
-//             // check if connection id in it is already in connections
-//             var found = false;
-//             for (var k = 0; k < connections.length; k++) {
-//               if (connections[k].id == result.connections[j].id) {
-//                 found = true;
-//               }
-//             }
-//             if (!found) {
-//               connections.push(result.connections[j]);
-//             }
-//           }
-//         }
-//       }
-
-//       var allObjects = {
-//         allConnections: connections,
-//         allStations: stations,
-//       };
-
-//       var json = JSON.stringify(allObjects);
-//       var blob = new Blob([json], { type: "application/json" });
-//       saveAs(blob, "canvasMap.json");
-//     },
-//   };
-// });
+import Station from "./station";
+import Connection from "./connection";
 
 function exportAsPNG() {
   const canvas = document.getElementById("workspace");
@@ -91,4 +12,69 @@ function exportAsPNG() {
   a.click();
 }
 
-export { exportAsPNG };
+function exportAsJSON(canvasState) {
+  const shapes = canvasState.shapes;
+  console.log("shapes:", shapes);
+  let stations = [];
+  let connections = [];
+
+  function replaceConnections(shape) {
+    const results = {
+      connectIds: [],
+      connections: [],
+    };
+    // for each of the connections, we want to add the id to an array
+    // and also replace the start and end with the station ids
+    for (const connection of shape.connections) {
+      // TODO do we want a separate simplified type where start/end are strings instead of station objects?
+      const copy = Connection.clone(connection);
+      copy.start = connection.start.id;
+      copy.end = connection.end.id;
+      results.connectIds.push(copy.id);
+      results.connections.push(copy);
+    }
+
+    return results;
+  }
+
+  let result = null;
+  for (const shape of shapes) {
+    if (shape.type === "station") {
+      result = replaceConnections(shape);
+      const simplifiedShape = Station.clone(shape);
+      simplifiedShape.connections = result.connectIds;
+      stations = stations.concat(simplifiedShape.toJSON());
+
+      // check to make sure new result.connections not already found
+      // if new add to connections
+      for (const resultConnection of result.connections) {
+        // for each result
+        // check if connection id in it is already in connections
+        let found = false;
+        for (const newConnection of connections) {
+          if (newConnection.id === resultConnection.id) {
+            found = true;
+          }
+        }
+        if (!found) {
+          connections = connections.concat(resultConnection.toJSON());
+        }
+      }
+    }
+  }
+
+  const allObjects = {
+    allConnections: connections,
+    allStations: stations,
+  };
+
+  const json = JSON.stringify(allObjects);
+  const blob = new Blob([json], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "canvasMap.json";
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+export { exportAsPNG, exportAsJSON };
