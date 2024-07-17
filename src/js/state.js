@@ -155,6 +155,18 @@ export default class CanvasState {
     }
   }
 
+  removeShapes(shapes) {
+    for (const shape of shapes.importedShapes) {
+      this.removeShape(shape);
+    }
+  }
+
+  addShapes(shapes) {
+    for (const shape of shapes.importedShapes) {
+      this.addShape(shape);
+    }
+  }
+
   modifyShape(id, x, y) {
     // would be better to switch that to an options {}
     const l = this.#shapes.length;

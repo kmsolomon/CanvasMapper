@@ -131,6 +131,8 @@ export default class CanvasMapper {
         for (let i = 0; i < l; i++) {
           this.#canvas.addShape(u.object.connections[i]);
         }
+      } else if (u.type === "import") {
+        this.#canvas.removeShapes(u.object);
       }
     }
   }
@@ -165,6 +167,8 @@ export default class CanvasMapper {
         // } else if (r.type === "connection") {
         //   // TODO
         //   console.log("not implemented");
+      } else if (r.type === "import") {
+        this.#canvas.addShapes(r.object);
       }
     }
   }

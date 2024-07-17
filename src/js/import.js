@@ -1,4 +1,5 @@
 import Connection from "./connection";
+import HistoryStep from "./historystep";
 import Station from "./station";
 
 async function importFromJSON(evt, cm) {
@@ -19,6 +20,7 @@ async function importFromJSON(evt, cm) {
   let shapes = null;
 
   reader.onload = readSuccessful;
+  reader.readAsText(file);
 
   function readSuccessful(rEvt) {
     const json = rEvt.target.result;
@@ -82,6 +84,11 @@ async function importFromJSON(evt, cm) {
         cm.canvas.addShape(shape);
       }
       cm.canvas.valid = false;
+      cm.addToUndoHistory(
+        new HistoryStep("import", {
+          importedShapes: importedShapes,
+        })
+      );
     } catch (e) {
       console.error(e);
     }
@@ -95,8 +102,6 @@ async function importFromJSON(evt, cm) {
     }
     return null;
   }
-
-  reader.readAsText(file);
 }
 
 export { importFromJSON };
