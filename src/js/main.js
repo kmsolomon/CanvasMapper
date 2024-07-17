@@ -106,7 +106,7 @@ function setupListeners(cm) {
       cm.displayProperties();
       cm.canvas.valid = false; // force redraw
       Tools.handleSelectMouseDown(e, cm);
-    } else if (tool === "connectionBtn") {
+    } else if (tool === "connectionBtn" && cm.canvas.selection) {
       const selection = cm.canvas.selection; // TODO, probably want to select the station if you start a line on the station
       const line = new Connection(selection, mouse, `c${cm.cnum}`);
       cm.incrementCNum();
@@ -149,7 +149,6 @@ function setupListeners(cm) {
           shapes[i].contains(mouse.x, mouse.y) &&
           shapes[i].id !== cm.canvas.selection.id
         ) {
-          console.log("valid connection");
           // was a valid shape, we're happy
           validConnection = true;
           cm.canvas.activeLine.end = shapes[i];
