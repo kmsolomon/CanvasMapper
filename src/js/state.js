@@ -224,7 +224,7 @@ export default class CanvasState {
 
       // draw selection
       // right now this is just a stroke along the edge of the selected Shape
-      // TODO this part isn't working, need to fix
+      // TODO would like selection to be a separate shape so it doesn't interfere with user-selected borders
       if (this.#selection != null) {
         ctx.strokeStyle = this.#selectionColor;
         ctx.lineWidth = this.#selectionWidth;

@@ -4,6 +4,18 @@ body {
   font-size: 16px;
 }
 
+main {
+  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  justify-content: center;
+  gap: 4px;
+}
+
+.canvasMapper {
+  grid-column-start: 2;
+}
+
 #workspace {
   border: 2px solid #000;
   display: block;
@@ -13,57 +25,52 @@ body {
   padding-right: 0;
 }
 
-.header h1 {
-  display: inline;
-}
-
 #importFile {
   display: none;
 }
 
-/***********
- *  SaveMenu
- ***********/
+/**********
+ * Button
+ **********/
 
-#saveMenu {
-  clear: left;
-  list-style: none;
-  float: left;
-  text-align: left;
+button {
+  border: 2px solid #000;
+  padding: 0.5rem;
+  font-size: 1rem;
 }
 
-#saveMenu li {
-  border-left: 2px solid #000;
-  border-right: 2px solid #000;
-  border-bottom: 2px solid #000;
-  padding: 5px;
+button:focus {
+  outline-offset: 3px;
 }
 
-#saveMenu li:hover {
+button:hover {
+  text-decoration: underline;
+}
+
+button:active {
   background-color: #3e6659;
   color: #fff;
 }
 
-#saveMenu li:first-child {
-  border-top: 2px solid #000;
+/***********
+ *  Import / Export Options
+ ***********/
+
+#importExportOptions {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  margin: 0.5rem;
 }
 
 /***********
  *  Toolbar
  ***********/
-.toolbar {
-  list-style: none;
-  float: left;
-}
-
-.toolbar li {
-  border-left: 2px solid #000;
-  border-right: 2px solid #000;
-  border-bottom: 2px solid #000;
-}
-
-.toolbar li:first-child {
-  border-top: 2px solid #000;
+.tools {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  row-gap: 1rem;
 }
 
 .toolbar .btn {
@@ -126,17 +133,14 @@ body {
 
 #properties {
   border: 2px solid #000;
-  clear: both;
-  float: left;
-  font-size: 14px;
+  font-size: 0.875rem;
   min-height: 100px;
-  margin-left: 40px;
   padding: 2px;
-  width: 250px;
+  min-width: 240px;
 }
 
 #properties h2 {
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 600;
 }
 

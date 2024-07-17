@@ -10,51 +10,60 @@
     <div class="header">
       <h1>CanvasMapper</h1>
     </div>
-    <div class="toolbar">
-      <button
-        id="selectBtn"
-        class="active btn"
-        aria-label="Select"
-        aria-pressed="true"
-      ></button>
-      <button
-        id="stationBtn"
-        class="btn"
-        aria-label="Add station"
-        aria-pressed="false"
-      ></button>
-      <button
-        id="connectionBtn"
-        class="btn"
-        aria-label="Add conneciton"
-        aria-pressed="false"
-      ></button>
-      <button id="deleteBtn" class="btn" aria-label="Delete selected"></button>
-      <button id="undoBtn" class="btn" aria-label="Undo"></button>
-      <button id="redoBtn" class="btn" aria-label="Redo"></button>
-    </div>
-    <div id="saveDiv">
-      <ul id="saveMenu">
-        <li id="downloadPNG" download="canvasMap.png">Download as PNG</li>
-        <li id="downloadJSON" download="application/json">Download as JSON</li>
-        <li id="importJSON">
-          <label id="importFromJSONBtn" for="importFile"
-            >Import from JSON</label
-          >
+    <main class="content">
+      <div class="tools">
+        <div class="toolbar">
+          <button
+            id="selectBtn"
+            class="active btn"
+            aria-label="Select"
+            aria-pressed="true"
+          ></button>
+          <button
+            id="stationBtn"
+            class="btn"
+            aria-label="Add station"
+            aria-pressed="false"
+          ></button>
+          <button
+            id="connectionBtn"
+            class="btn"
+            aria-label="Add conneciton"
+            aria-pressed="false"
+          ></button>
+          <button
+            id="deleteBtn"
+            class="btn"
+            aria-label="Delete selected"
+          ></button>
+          <button id="undoBtn" class="btn" aria-label="Undo"></button>
+          <button id="redoBtn" class="btn" aria-label="Redo"></button>
+        </div>
+        <div id="properties">
+          <h2>Properties</h2>
+          <div id="propdiv">Nothing is selected</div>
+        </div>
+      </div>
+      <div class="canvasMap">
+        <canvas id="workspace"></canvas>
+        <div id="importExportOptions">
+          <button id="downloadPNG" type="button" download="canvasMap.png">
+            Download as PNG
+          </button>
+          <button id="downloadJSON" type="button" download="application/json">
+            Download as JSON
+          </button>
+          <button id="importFromJSONBtn" type="button">Import from JSON</button>
           <input
             id="importFile"
             type="file"
             name="jsonFile"
             accept="application/json"
           />
-        </li>
-      </ul>
-    </div>
-    <div id="properties">
-      <h2>Properties</h2>
-      <div id="propdiv">Nothing is selected</div>
-    </div>
-    <canvas id="workspace"></canvas>
+        </div>
+      </div>
+    </main>
+
     <template id="emptyProps"> Nothing is selected </template>
     <template id="stationProps">
       <div id="stProperties">

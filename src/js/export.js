@@ -14,7 +14,6 @@ function exportAsPNG() {
 
 function exportAsJSON(canvasState) {
   const shapes = canvasState.shapes;
-  console.log("shapes:", shapes);
   let stations = [];
   let connections = [];
   let addedConnections = [];
