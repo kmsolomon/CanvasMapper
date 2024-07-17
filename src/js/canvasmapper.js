@@ -6,6 +6,7 @@ export default class CanvasMapper {
   #maxHistory = 10; // customizable number of undo/redo steps
   #snum = 0; // number we'll use for station ids
   #cnum = 0; // number we'll use for connection ids
+  #imp = 0; // number of files imported to help avoid id conflicts
   #canvas = null;
   #activeTool = "selectBtn";
 
@@ -42,12 +43,20 @@ export default class CanvasMapper {
     return this.#cnum;
   }
 
+  get imp() {
+    return this.#imp;
+  }
+
   incrementSNum() {
     this.#snum += 1;
   }
 
   incrementCNum() {
     this.#cnum += 1;
+  }
+
+  incrementImp() {
+    this.#imp += 1;
   }
 
   displayProperties() {

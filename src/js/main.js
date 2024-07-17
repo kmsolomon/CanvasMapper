@@ -3,6 +3,7 @@ import CanvasState from "./state";
 import Connection from "./connection";
 import CanvasMapper from "./canvasmapper";
 import { exportAsJSON, exportAsPNG } from "./export";
+import { importFromJSON } from "./import";
 
 function setupListeners(cm) {
   /***  Buttons  ***/
@@ -32,18 +33,27 @@ function setupListeners(cm) {
   document
     .getElementById("downloadJSON")
     .addEventListener("click", function () {
-      console.log("download json");
       exportAsJSON(cm.canvas);
     });
-  document.getElementById("importFile").addEventListener("click", function (e) {
-    console.log("import!");
-    // Import.importFromJSON(e, state);
-  });
+  document
+    .getElementById("importFromJSONBtn")
+    .addEventListener("click", function (e) {
+      e.stopPropagation();
+      document.getElementById("importFile").click();
+    });
+  document
+    .getElementById("importFile")
+    .addEventListener("change", async function (e) {
+      if (e.target.value !== "") {
+        await importFromJSON(e, cm);
+        e.target.value = "";
+      }
+    });
 
   /***  Canvas Listeners  ***/
   // fixes double clicking causing text not on canvas to get selected // TODO -- later verify if still needed
   const canvas = cm.canvas.canvas;
-  const test = cm;
+  //const test = cm;
   canvas.addEventListener(
     "selectstart",
     function (e) {
