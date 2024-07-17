@@ -17,6 +17,7 @@ function exportAsJSON(canvasState) {
   console.log("shapes:", shapes);
   let stations = [];
   let connections = [];
+  let addedConnections = [];
 
   function replaceConnections(shape) {
     const results = {
@@ -33,7 +34,6 @@ function exportAsJSON(canvasState) {
       results.connectIds.push(copy.id);
       results.connections.push(copy);
     }
-
     return results;
   }
 
@@ -44,20 +44,12 @@ function exportAsJSON(canvasState) {
       const simplifiedShape = Station.clone(shape);
       simplifiedShape.connections = result.connectIds;
       stations = stations.concat(simplifiedShape.toJSON());
-
       // check to make sure new result.connections not already found
       // if new add to connections
       for (const resultConnection of result.connections) {
-        // for each result
-        // check if connection id in it is already in connections
-        let found = false;
-        for (const newConnection of connections) {
-          if (newConnection.id === resultConnection.id) {
-            found = true;
-          }
-        }
-        if (!found) {
+        if (!addedConnections.includes(resultConnection.id)) {
           connections = connections.concat(resultConnection.toJSON());
+          addedConnections = addedConnections.concat(resultConnection.id);
         }
       }
     }
