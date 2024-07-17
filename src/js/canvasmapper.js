@@ -164,9 +164,6 @@ export default class CanvasMapper {
         this.#canvas.addShape(r.object);
       } else if (r.type === "delete") {
         this.#canvas.removeShape(r.object);
-        // } else if (r.type === "connection") {
-        //   // TODO
-        //   console.log("not implemented");
       } else if (r.type === "import") {
         this.#canvas.addShapes(r.object);
       }

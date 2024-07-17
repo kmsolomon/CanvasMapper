@@ -1,7 +1,8 @@
 import * as Tools from "./toolbar";
+import CanvasMapper from "./canvasmapper";
 import CanvasState from "./state";
 import Connection from "./connection";
-import CanvasMapper from "./canvasmapper";
+import HistoryStep from "./historystep";
 import { exportAsJSON, exportAsPNG } from "./export";
 import { importFromJSON } from "./import";
 
@@ -153,10 +154,7 @@ function setupListeners(cm) {
           validConnection = true;
           cm.canvas.activeLine.end = shapes[i];
           shapes[i].connections.push(cm.canvas.activeLine);
-          // TODO - undo/redo for connections
-          // UndoRedo.addToUndoHistory(
-          //   new HistoryStep("add", cm.canvas.activeLine)
-          // );
+          cm.addToUndoHistory(new HistoryStep("add", cm.canvas.activeLine));
         }
       }
       if (!validConnection) {
