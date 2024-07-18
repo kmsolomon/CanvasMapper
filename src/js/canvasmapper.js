@@ -65,6 +65,7 @@ export default class CanvasMapper {
       const template = document.querySelector("#stationProps");
       const clone = template.content.cloneNode(true);
       const selectedShape = this.#canvas.selection;
+      const canvas = this.#canvas;
 
       props.innerHTML = "";
       // get the name/coords/color from station and update fields before appending
@@ -73,6 +74,36 @@ export default class CanvasMapper {
       clone.querySelector("#stXInput").value = selectedShape.xcoord;
       clone.querySelector("#stYInput").value = selectedShape.ycoord;
       clone.querySelector("#stZInput").value = selectedShape.zcoord;
+
+      clone
+        .querySelector("#stColorField")
+        .addEventListener("change", function (e) {
+          // TODO props change history step
+          selectedShape.fill = e.target.value;
+          canvas.valid = false;
+        });
+      clone
+        .querySelector("#stNameInput")
+        .addEventListener("change", function (e) {
+          // TODO props change history step
+          selectedShape.name = e.target.value;
+          canvas.valid = false;
+        });
+      clone.querySelector("#stXInput").addEventListener("change", function (e) {
+        // TODO props change history step
+        selectedShape.xcoord = e.target.value;
+        canvas.valid = false;
+      });
+      clone.querySelector("#stYInput").addEventListener("change", function (e) {
+        // TODO props change history step
+        selectedShape.ycoord = e.target.value;
+        canvas.valid = false;
+      });
+      clone.querySelector("#stZInput").addEventListener("change", function (e) {
+        // TODO props change history step
+        selectedShape.zcoord = e.target.value;
+        canvas.valid = false;
+      });
       props.appendChild(clone);
     }
   }
