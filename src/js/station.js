@@ -57,7 +57,7 @@ export default class Station {
       ctx.fillStyle = "#FFF";
       ctx.fillRect(
         this.#x - center,
-        this.#y + this.#h + this.#smallPadding,
+        this.#y + this.#h,
         metrics.width,
         halfStation
       );
