@@ -7,6 +7,7 @@ export default class CanvasMapper {
   #snum = 0; // number we'll use for station ids
   #cnum = 0; // number we'll use for connection ids
   #imp = 0; // number of files imported to help avoid id conflicts
+  #lastStationFill = "#00AA00";
   #canvas = null;
   #activeTool = "selectBtn";
 
@@ -43,6 +44,16 @@ export default class CanvasMapper {
     return this.#cnum;
   }
 
+  get lastStationFill() {
+    return this.#lastStationFill;
+  }
+
+  set lastStationFill(c) {
+    if (/^#[0-9A-F]{6}$/i.test(c)) {
+      this.#lastStationFill = c;
+    }
+  }
+
   get imp() {
     return this.#imp;
   }
@@ -66,6 +77,7 @@ export default class CanvasMapper {
       const clone = template.content.cloneNode(true);
       const selectedShape = this.#canvas.selection;
       const canvas = this.#canvas;
+      const cm = this;
 
       props.innerHTML = "";
       // get the name/coords/color from station and update fields before appending
@@ -80,6 +92,7 @@ export default class CanvasMapper {
         .addEventListener("change", function (e) {
           // TODO props change history step
           selectedShape.fill = e.target.value;
+          cm.lastStationFill = e.target.value;
           canvas.valid = false;
         });
       clone

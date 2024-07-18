@@ -32,7 +32,7 @@ function handleAddStation(e, cm) {
     mouse.y - offset.y - 15,
     30,
     30,
-    "#00FF00",
+    cm.lastStationFill,
     `s${cm.snum}`
   );
   cm.incrementSNum();

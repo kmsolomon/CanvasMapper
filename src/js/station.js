@@ -19,7 +19,9 @@ export default class Station {
     this.#y = y;
     this.#w = w;
     this.#h = h;
-    this.#fill = fill;
+    if (/^#[0-9A-F]{6}$/i.test(fill)) {
+      this.#fill = fill;
+    }
     this.#id = snum;
     this.draw = this.draw.bind(this);
     this.contains = this.contains.bind(this);
@@ -134,8 +136,9 @@ export default class Station {
   }
 
   set fill(n) {
-    // TODO check valid hex/rgb string
-    this.#fill = n;
+    if (/^#[0-9A-F]{6}$/i.test(n)) {
+      this.#fill = n;
+    }
   }
 
   get x() {
