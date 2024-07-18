@@ -88,6 +88,15 @@ function setupListeners(cm) {
     }
 
     if (!validSelection && cm.canvas.selection) {
+      // Still need to save the values here because of some cases in Firefox
+      if (cm.canvas.selection.type === "station") {
+        cm.canvas.selection.name = document.getElementById("stNameInput").value;
+        cm.canvas.selection.xcoord = document.getElementById("stXInput").value;
+        cm.canvas.selection.ycoord = document.getElementById("stYInput").value;
+        cm.canvas.selection.zcoord = document.getElementById("stZInput").value;
+        cm.canvas.selection.fill =
+          document.getElementById("stColorField").value;
+      }
       cm.canvas.selection = null;
       cm.canvas.valid = false; // Need to clear the old selection border
       cm.clearDisplayProps();
