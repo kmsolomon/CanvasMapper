@@ -168,6 +168,8 @@ export default class CanvasMapper {
       this.#redoHistory.push(u);
 
       if (u.type === "add") {
+        this.#canvas.selection = null;
+        this.clearDisplayProps();
         this.#canvas.removeShape(u.object);
       } else if (u.type === "delete") {
         this.#canvas.addShape(u.object);
@@ -205,6 +207,8 @@ export default class CanvasMapper {
       }
       this.#undoHistory.push(r);
       if (r.type === "add") {
+        this.#canvas.selection = null;
+        this.clearDisplayProps();
         this.#canvas.addShape(r.object);
       } else if (r.type === "delete") {
         this.#canvas.removeShape(r.object);
