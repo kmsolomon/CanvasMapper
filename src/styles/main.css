@@ -238,4 +238,5 @@ input[type="number"] {
   min-height: 1.875rem;
   padding: 4px;
   font-size: 1rem;
+  max-width: 100%;
 }
