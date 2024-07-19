@@ -51,6 +51,15 @@ function setupListeners(cm) {
       }
     });
 
+  window.addEventListener("resize", function (e) {
+    const canvas = document.getElementById("workspace");
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
+    cm.canvas.width = canvas.clientWidth;
+    cm.canvas.height = canvas.clientHeight;
+    cm.canvas.valid = false;
+  });
+
   /***  Canvas Listeners  ***/
   // fixes double clicking causing text not on canvas to get selected // TODO -- later verify if still needed
   const canvas = cm.canvas.canvas;
@@ -185,10 +194,9 @@ function setupListeners(cm) {
 }
 
 function initCanvas() {
-  // TODO Would be nice to be able to resize the canvas later
   const canvas = document.getElementById("workspace");
-  canvas.setAttribute("width", "800");
-  canvas.setAttribute("height", "600");
+  canvas.width = canvas.clientWidth;
+  canvas.height = canvas.clientHeight;
   return new CanvasState(canvas);
 }
 

@@ -115,6 +115,14 @@ export default class CanvasState {
     this.#connecting = b;
   }
 
+  set width(w) {
+    this.#width = w;
+  }
+
+  set height(h) {
+    this.#height = h;
+  }
+
   addShape(shape) {
     this.#shapes.push(shape);
     this.#valid = false;

@@ -2,64 +2,71 @@
 <html>
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>CanvasMapper</title>
     <link type="text/css" rel="stylesheet" href="/src/styles/main.css" />
   </head>
   <body>
-    <div class="header">
+    <header>
       <h1>CanvasMapper</h1>
-    </div>
+    </header>
     <main class="content">
-      <div class="tools">
-        <div class="toolbar">
-          <button
-            id="selectBtn"
-            class="active btn"
-            aria-label="Select"
-            aria-pressed="true"
-          ></button>
-          <button
-            id="stationBtn"
-            class="btn"
-            aria-label="Add station"
-            aria-pressed="false"
-          ></button>
-          <button
-            id="connectionBtn"
-            class="btn"
-            aria-label="Add conneciton"
-            aria-pressed="false"
-          ></button>
-          <button
-            id="deleteBtn"
-            class="btn"
-            aria-label="Delete selected"
-          ></button>
-          <button id="undoBtn" class="btn" aria-label="Undo"></button>
-          <button id="redoBtn" class="btn" aria-label="Redo"></button>
+      <div class="main-grid">
+        <div class="tools">
+          <div class="toolbar">
+            <button
+              id="selectBtn"
+              class="active btn"
+              aria-label="Select"
+              aria-pressed="true"
+            ></button>
+            <button
+              id="stationBtn"
+              class="btn"
+              aria-label="Add station"
+              aria-pressed="false"
+            ></button>
+            <button
+              id="connectionBtn"
+              class="btn"
+              aria-label="Add conneciton"
+              aria-pressed="false"
+            ></button>
+            <button
+              id="deleteBtn"
+              class="btn"
+              aria-label="Delete selected"
+            ></button>
+            <button id="undoBtn" class="btn" aria-label="Undo"></button>
+            <button id="redoBtn" class="btn" aria-label="Redo"></button>
+          </div>
+        </div>
+        <div class="canvas-mapper">
+          <div class="canvas-wrapper">
+            <canvas id="workspace"
+              >A space for drawing a map of connected stations</canvas
+            >
+          </div>
         </div>
         <div id="properties">
           <h2>Properties</h2>
           <div id="propdiv">Nothing is selected</div>
         </div>
       </div>
-      <div class="canvasMap">
-        <canvas id="workspace"></canvas>
-        <div id="importExportOptions">
-          <button id="downloadPNG" type="button" download="canvasMap.png">
-            Download as PNG
-          </button>
-          <button id="downloadJSON" type="button" download="application/json">
-            Download as JSON
-          </button>
-          <button id="importFromJSONBtn" type="button">Import from JSON</button>
-          <input
-            id="importFile"
-            type="file"
-            name="jsonFile"
-            accept="application/json"
-          />
-        </div>
+      <div id="importExportOptions">
+        <button id="downloadPNG" type="button" download="canvasMap.png">
+          Download as PNG
+        </button>
+        <button id="downloadJSON" type="button" download="application/json">
+          Download as JSON
+        </button>
+        <button id="importFromJSONBtn" type="button">Import from JSON</button>
+        <input
+          id="importFile"
+          type="file"
+          name="jsonFile"
+          accept="application/json"
+        />
       </div>
     </main>
 
