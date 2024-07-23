@@ -50,18 +50,23 @@ export default class Station {
     ctx.fillRect(this.#x, this.#y, this.#w, this.#h);
 
     if (this.#name !== null) {
+      const isDarkMode = window.matchMedia(
+        "(prefers-color-scheme: dark)"
+      ).matches;
+      const textBg = isDarkMode ? "#343434" : "#FFFFFF";
+      const textColor = isDarkMode ? "#dddddd" : "#000000";
       ctx.font = "12px Courier";
       const metrics = ctx.measureText(this.#name);
       const center = metrics.width / 2 - 15;
       const halfStation = this.#w / 2;
-      ctx.fillStyle = "#FFF";
+      ctx.fillStyle = textBg;
       ctx.fillRect(
         this.#x - center,
         this.#y + this.#h,
         metrics.width,
         halfStation
       );
-      ctx.fillStyle = "#000";
+      ctx.fillStyle = textColor;
       ctx.fillText(
         this.#name,
         this.#x - center,

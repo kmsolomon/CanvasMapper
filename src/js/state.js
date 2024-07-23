@@ -19,6 +19,7 @@ export default class CanvasState {
   #selectionColor = "#CC0000";
   #selectionWidth = 2;
   #interval = 30;
+  #bgColor = "#FFFFFF";
   // TODO -- I feel like there's a better way to do this/shouldn't be accessing these within the state
   #htmlTop = document.body.parentNode.offsetTop;
   #htmlLeft = document.body.parentNode.offsetLeft;
@@ -197,7 +198,7 @@ export default class CanvasState {
       const ctx = this.#ctx;
       const shapes = this.#shapes;
       this.clear();
-      ctx.fillStyle = "#FFF";
+      ctx.fillStyle = this.#bgColor;
       ctx.fillRect(0, 0, this.#width, this.#height); // Draw white background so it's not transparent when downloaded
       // draw all shapes
       // TODO REFACTOR -- Why is the loop for connections and stations separate?
@@ -298,6 +299,15 @@ export default class CanvasState {
       this.#htmlTop;
 
     return { x: offsetX, y: offsetY };
+  }
+
+  enableDarkMode(b) {
+    if (b) {
+      this.#bgColor = "#343434";
+    } else {
+      this.#bgColor = "#FFFFFF";
+    }
+    this.#valid = false;
   }
 
   // IDK what this was for, commenting out to see what happens

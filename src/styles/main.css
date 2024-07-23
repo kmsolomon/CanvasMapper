@@ -1,5 +1,27 @@
 :root {
   --border: 2px solid #000;
+  --primary-font: #000;
+  --contrast-font: #fff;
+  --primary: #dcefe6;
+  --secondary: #3e6659;
+  --background: #fff;
+  --primary-btn: #eee;
+  --primary-btn-hover: #ddd;
+  --input-bg: #fff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --border: 2px solid #ddd;
+    --primary-font: #fff;
+    --contrast-font: #000;
+    --primary: #dcefe6;
+    --secondary: #3e6659;
+    --background: #000;
+    --primary-btn: #555;
+    --primary-btn-hover: #777;
+    --input-bg: #555;
+  }
 }
 
 *,
@@ -13,9 +35,11 @@
 }
 
 body {
+  color: var(--primary-font);
   font-family: Verdana, Arial, Helvetica, sans-serif;
   text-align: center;
   font-size: 16px;
+  background-color: var(--background);
 }
 
 main {
@@ -26,7 +50,7 @@ main {
 
 header {
   padding: 0.5rem;
-  background-color: #dcefe6;
+  background-color: var(--primary);
   text-align: left;
   border: var(--border);
   border-left: none;
@@ -35,6 +59,18 @@ header {
 
 h1 {
   font-size: 1.25rem;
+  color: var(--primary-font);
+}
+
+h2 {
+  color: var(--primary-font);
+}
+
+@media (prefers-color-scheme: dark) {
+  h1,
+  h2 {
+    color: var(--contrast-font);
+  }
 }
 
 .main-grid {
@@ -103,7 +139,9 @@ h1 {
  **********/
 
 button {
+  background-color: var(--primary-btn);
   border: var(--border);
+  color: var(--primary-font);
   padding: 0.5rem;
   font-size: 1rem;
 }
@@ -114,11 +152,13 @@ button:focus {
 
 button:hover {
   text-decoration: underline;
+  background-color: var(--primary-btn-hover);
 }
 
-button:active {
-  background-color: #3e6659;
-  color: #fff;
+button:active,
+button.active {
+  background-color: var(--secondary);
+  color: var(--contrast-font);
 }
 
 /***********
@@ -165,12 +205,24 @@ button:active {
   background-image: url(../assets/images/cursor.svg);
 }
 
+@media (prefers-color-scheme: dark) {
+  #selectBtn {
+    background-image: url(../assets/images/cursor_active.svg);
+  }
+}
+
 #stationBtn.active {
   background-image: url(../assets/images/station_active.svg);
 }
 
 #stationBtn {
   background-image: url(../assets/images/station.svg);
+}
+
+@media (prefers-color-scheme: dark) {
+  #stationBtn {
+    background-image: url(../assets/images/station_active.svg);
+  }
 }
 
 #connectionBtn.active {
@@ -181,12 +233,24 @@ button:active {
   background-image: url(../assets/images/connection.svg);
 }
 
+@media (prefers-color-scheme: dark) {
+  #connectionBtn {
+    background-image: url(../assets/images/connection_active.svg);
+  }
+}
+
 #deleteBtn {
   background-image: url(../assets/images/delete.svg);
 }
 
 #deleteBtn:active {
   background-image: url(../assets/images/delete_active.svg);
+}
+
+@media (prefers-color-scheme: dark) {
+  #deleteBtn {
+    background-image: url(../assets/images/delete_active.svg);
+  }
 }
 
 #undoBtn {
@@ -197,12 +261,24 @@ button:active {
   background-image: url(../assets/images/undo_active.svg);
 }
 
+@media (prefers-color-scheme: dark) {
+  #undoBtn {
+    background-image: url(../assets/images/undo_active.svg);
+  }
+}
+
 #redoBtn {
   background-image: url(../assets/images/redo.svg);
 }
 
 #redoBtn:active {
   background-image: url(../assets/images/redo_active.svg);
+}
+
+@media (prefers-color-scheme: dark) {
+  #redoBtn {
+    background-image: url(../assets/images/redo_active.svg);
+  }
 }
 
 /**********
@@ -222,7 +298,7 @@ button:active {
   font-size: 0.875rem;
   font-weight: 600;
   padding: 0.5rem 1rem;
-  background-color: #dcefe6;
+  background-color: var(--primary);
   border-bottom: var(--border);
 }
 
@@ -240,6 +316,8 @@ button:active {
 
 input[type="text"],
 input[type="number"] {
+  color: var(--primary-font);
+  background-color: var(--input-bg);
   border: var(--border);
   min-height: 1.875rem;
   padding: 4px;

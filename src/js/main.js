@@ -130,7 +130,16 @@ function setupListeners(cm) {
       Tools.handleSelectMouseDown(e, cm);
     } else if (tool === "connectionBtn" && cm.canvas.selection) {
       const selection = cm.canvas.selection; // TODO, probably want to select the station if you start a line on the station
-      const line = new Connection(selection, mouse, `c${cm.cnum}`);
+      const connectColor = window.matchMedia("(prefers-color-scheme: dark)")
+        .matches
+        ? "#dddddd"
+        : "#000000";
+      const line = new Connection(
+        selection,
+        mouse,
+        `c${cm.cnum}`,
+        connectColor
+      );
       cm.incrementCNum();
       cm.canvas.connecting = true;
       selection.connections.push(line);
@@ -234,6 +243,12 @@ function setupListeners(cm) {
   });
   canvas.addEventListener("mouseup", handleCanvasMouseUp, { passive: false });
   canvas.addEventListener("touchend", handleCanvasMouseUp, { passive: false });
+
+  window
+    .matchMedia("(prefers-color-scheme: dark)")
+    .addEventListener("change", function (e) {
+      cm.canvas.enableDarkMode(e.matches);
+    });
 }
 
 function initCanvas() {
@@ -245,6 +260,9 @@ function initCanvas() {
 
 function init() {
   const canvasState = initCanvas();
+  if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+    canvasState.enableDarkMode(true);
+  }
   const cm = new CanvasMapper(10, canvasState);
   setupListeners(cm);
 
