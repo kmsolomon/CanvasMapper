@@ -74,9 +74,21 @@ function setupListeners(cm) {
   );
 
   function handleCanvasMouseDown(e) {
+    e.preventDefault();
+    e.stopPropagation();
+
     const tool = cm.activeTool;
     const offset = cm.canvas.getMouseOffset();
-    const mouse = { x: e.pageX - offset.x, y: e.pageY - offset.y };
+    let mouse = null;
+    if (e.type === "touchstart" && e.targetTouches?.length > 0) {
+      mouse = {
+        x: e.targetTouches[0].pageX - offset.x,
+        y: e.targetTouches[0].pageY - offset.y,
+      };
+    } else {
+      mouse = { x: e.pageX - offset.x, y: e.pageY - offset.y };
+    }
+
     const shapes = cm.canvas.shapes;
     let validSelection = false;
 
@@ -86,6 +98,7 @@ function setupListeners(cm) {
           const selectedShape = shapes[i];
 
           cm.canvas.selection = selectedShape;
+          cm.displayProperties();
           validSelection = true;
           // Keep track of where in the object we clicked
           // so we can move it smoothly (see mousemove)
@@ -127,8 +140,18 @@ function setupListeners(cm) {
   }
 
   function handleCanvasMouseMove(e) {
+    e.preventDefault();
+    e.stopPropagation();
     const offset = cm.canvas.getMouseOffset();
-    const mouse = { x: e.pageX - offset.x, y: e.pageY - offset.y };
+    let mouse = null;
+    if (e.type === "touchmove" && e.changedTouches?.length > 0) {
+      mouse = {
+        x: e.changedTouches[0].pageX - offset.x,
+        y: e.changedTouches[0].pageY - offset.y,
+      };
+    } else {
+      mouse = { x: e.pageX - offset.x, y: e.pageY - offset.y };
+    }
     if (cm.canvas.dragging && cm.canvas.selection) {
       // Don't want to drag the object by its top-left corner, that's what offset is for
       cm.canvas.selection.x = mouse.x - cm.canvas.dragoffx;
@@ -143,37 +166,9 @@ function setupListeners(cm) {
   }
 
   function handleCanvasMouseUp(e) {
+    e.preventDefault();
+    e.stopPropagation();
     cm.canvas.dragging = false;
-    if (cm.canvas.connecting) {
-      // check that we ended on a station
-      // if yes, add that as the end point
-      // if not, remove the line
-      let validConnection = false;
-      // TODO - 3rd time we have the offset then mouse thing. just put it in a function
-      const offset = cm.canvas.getMouseOffset();
-      const mouse = { x: e.pageX - offset.x, y: e.pageY - offset.y };
-      const shapes = cm.canvas.shapes;
-      for (let i = shapes.length - 1; i >= 0; i--) {
-        if (
-          shapes[i].contains(mouse.x, mouse.y) &&
-          shapes[i].id !== cm.canvas.selection.id
-        ) {
-          // was a valid shape, we're happy
-          validConnection = true;
-          cm.canvas.activeLine.end = shapes[i];
-          shapes[i].connections.push(cm.canvas.activeLine);
-          cm.addToUndoHistory(new HistoryStep("add", cm.canvas.activeLine));
-        }
-      }
-      if (!validConnection) {
-        cm.canvas.removeShape(cm.canvas.activeLine);
-      }
-      cm.canvas.activeLine = null;
-    }
-    cm.canvas.connecting = false;
-  }
-
-  function handleCanvasClick(e) {
     const tool = cm.activeTool;
     switch (tool) {
       case "stationBtn":
@@ -182,15 +177,63 @@ function setupListeners(cm) {
       case "selectBtn":
         Tools.handleSelectClick(e, cm);
         break;
+      case "connectionBtn":
+        if (cm.canvas.connecting) {
+          // check that we ended on a station
+          // if yes, add that as the end point
+          // if not, remove the line
+          let validConnection = false;
+          // TODO - 3rd time we have the offset then mouse thing. just put it in a function
+          const offset = cm.canvas.getMouseOffset();
+          let mouse = null;
+          if (e.type === "touchend" && e.changedTouches?.length > 0) {
+            mouse = {
+              x: e.changedTouches[0].pageX - offset.x,
+              y: e.changedTouches[0].pageY - offset.y,
+            };
+          } else {
+            mouse = { x: e.pageX - offset.x, y: e.pageY - offset.y };
+          }
+          const shapes = cm.canvas.shapes;
+          for (let i = shapes.length - 1; i >= 0; i--) {
+            if (
+              shapes[i].contains(mouse.x, mouse.y) &&
+              shapes[i].id !== cm.canvas.selection.id
+            ) {
+              // was a valid shape, we're happy
+              validConnection = true;
+              cm.canvas.activeLine.end = shapes[i];
+              shapes[i].connections.push(cm.canvas.activeLine);
+              cm.addToUndoHistory(new HistoryStep("add", cm.canvas.activeLine));
+            }
+          }
+          if (!validConnection) {
+            cm.canvas.removeShape(cm.canvas.activeLine);
+          }
+          cm.canvas.activeLine = null;
+        }
+        break;
       default:
         break;
     }
+
+    cm.canvas.connecting = false;
   }
 
-  canvas.addEventListener("mousedown", handleCanvasMouseDown, true);
-  canvas.addEventListener("mousemove", handleCanvasMouseMove, true);
-  canvas.addEventListener("mouseup", handleCanvasMouseUp, true);
-  canvas.addEventListener("click", handleCanvasClick, true);
+  canvas.addEventListener("mousedown", handleCanvasMouseDown, {
+    passive: false,
+  });
+  canvas.addEventListener("touchstart", handleCanvasMouseDown, {
+    passive: false,
+  });
+  canvas.addEventListener("mousemove", handleCanvasMouseMove, {
+    passive: false,
+  });
+  canvas.addEventListener("touchmove", handleCanvasMouseMove, {
+    passive: false,
+  });
+  canvas.addEventListener("mouseup", handleCanvasMouseUp, { passive: false });
+  canvas.addEventListener("touchend", handleCanvasMouseUp, { passive: false });
 }
 
 function initCanvas() {

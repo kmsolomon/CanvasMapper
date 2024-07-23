@@ -25,7 +25,16 @@ function deletePart(e, cm) {
 }
 
 function handleAddStation(e, cm) {
-  const mouse = { x: e.pageX, y: e.pageY }; // TODO -- offset?
+  let mouse = null;
+  // TODO, same mouse calcs we do in main, should have function to get
+  if (e.type === "touchend" && e.changedTouches?.length > 0) {
+    mouse = {
+      x: e.changedTouches[0].pageX,
+      y: e.changedTouches[0].pageY,
+    };
+  } else {
+    mouse = { x: e.pageX, y: e.pageY };
+  }
   const offset = cm.canvas.getMouseOffset();
   const newStation = new Station(
     mouse.x - offset.x - 15,
