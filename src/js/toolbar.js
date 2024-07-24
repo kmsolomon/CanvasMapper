@@ -1,5 +1,6 @@
 import Station from "./station";
 import HistoryStep from "./historystep";
+import { getEventMouseCoords } from "./utils";
 
 function changeTool(btn, cm) {
   // remove active from others buttons, apply active to the clicked tool
@@ -25,20 +26,12 @@ function deletePart(e, cm) {
 }
 
 function handleAddStation(e, cm) {
-  let mouse = null;
-  // TODO, same mouse calcs we do in main, should have function to get
-  if (e.type === "touchend" && e.changedTouches?.length > 0) {
-    mouse = {
-      x: e.changedTouches[0].pageX,
-      y: e.changedTouches[0].pageY,
-    };
-  } else {
-    mouse = { x: e.pageX, y: e.pageY };
-  }
   const offset = cm.canvas.getMouseOffset();
+  let mouse = getEventMouseCoords(e, offset);
+
   const newStation = new Station(
-    mouse.x - offset.x - 15,
-    mouse.y - offset.y - 15,
+    mouse.x - 15,
+    mouse.y - 15,
     30,
     30,
     cm.lastStationFill,

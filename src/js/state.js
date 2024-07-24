@@ -257,31 +257,6 @@ export default class CanvasState {
     }
   }
 
-  // TODO REFACTOR -- I suspect I shouldn't have this within the actual class
-  getMouse(e) {
-    const element = this.#canvas;
-    let offsetX = 0,
-      offsetY = 0,
-      mx,
-      my;
-
-    if (element.offsetParent !== undefined) {
-      // TODO I have no idea what the below does?
-      do {
-        offsetX += element.offsetLeft;
-        offsetY += element.offsetTop;
-      } while ((element = element.offsetParent));
-    }
-
-    offsetX += this.#stylePaddingLeft + this.#styleBorderLeft + this.#htmlLeft;
-    offsetY += this.#stylePaddingTop + this.#styleBorderTop + this.#htmlTop;
-
-    mx = e.pageX - offsetX;
-    my = e.pageY - offsetY;
-
-    return { x: mx, y: my };
-  }
-
   getMouseOffset() {
     const canvas = this.#canvas;
     let offsetX = 0,

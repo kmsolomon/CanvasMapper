@@ -5,6 +5,7 @@ import Connection from "./connection";
 import HistoryStep from "./historystep";
 import { exportAsJSON, exportAsPNG } from "./export";
 import { importFromJSON } from "./import";
+import { getEventMouseCoords } from "./utils";
 
 function setupListeners(cm) {
   /***  Buttons  ***/
@@ -79,15 +80,7 @@ function setupListeners(cm) {
 
     const tool = cm.activeTool;
     const offset = cm.canvas.getMouseOffset();
-    let mouse = null;
-    if (e.type === "touchstart" && e.targetTouches?.length > 0) {
-      mouse = {
-        x: e.targetTouches[0].pageX - offset.x,
-        y: e.targetTouches[0].pageY - offset.y,
-      };
-    } else {
-      mouse = { x: e.pageX - offset.x, y: e.pageY - offset.y };
-    }
+    let mouse = getEventMouseCoords(e, offset);
 
     const shapes = cm.canvas.shapes;
     let validSelection = false;
@@ -152,15 +145,8 @@ function setupListeners(cm) {
     e.preventDefault();
     e.stopPropagation();
     const offset = cm.canvas.getMouseOffset();
-    let mouse = null;
-    if (e.type === "touchmove" && e.changedTouches?.length > 0) {
-      mouse = {
-        x: e.changedTouches[0].pageX - offset.x,
-        y: e.changedTouches[0].pageY - offset.y,
-      };
-    } else {
-      mouse = { x: e.pageX - offset.x, y: e.pageY - offset.y };
-    }
+    let mouse = getEventMouseCoords(e, offset);
+
     if (cm.canvas.dragging && cm.canvas.selection) {
       // Don't want to drag the object by its top-left corner, that's what offset is for
       cm.canvas.selection.x = mouse.x - cm.canvas.dragoffx;
@@ -194,15 +180,7 @@ function setupListeners(cm) {
           let validConnection = false;
           // TODO - 3rd time we have the offset then mouse thing. just put it in a function
           const offset = cm.canvas.getMouseOffset();
-          let mouse = null;
-          if (e.type === "touchend" && e.changedTouches?.length > 0) {
-            mouse = {
-              x: e.changedTouches[0].pageX - offset.x,
-              y: e.changedTouches[0].pageY - offset.y,
-            };
-          } else {
-            mouse = { x: e.pageX - offset.x, y: e.pageY - offset.y };
-          }
+          let mouse = getEventMouseCoords(e, offset);
           const shapes = cm.canvas.shapes;
           for (let i = shapes.length - 1; i >= 0; i--) {
             if (
