@@ -114,7 +114,9 @@ function setupListeners(cm) {
       }
       cm.canvas.selection = null;
       cm.canvas.valid = false; // Need to clear the old selection border
-      cm.clearDisplayProps();
+      if (cm.activeTool !== "stationBtn") {
+        cm.clearDisplayProps();
+      }
     }
 
     if (tool === "selectBtn") {
