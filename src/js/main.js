@@ -124,7 +124,7 @@ function setupListeners(cm) {
       cm.canvas.valid = false; // force redraw
       Tools.handleSelectMouseDown(e, cm);
     } else if (tool === "connectionBtn" && cm.canvas.selection) {
-      const selection = cm.canvas.selection; // TODO, probably want to select the station if you start a line on the station
+      const selection = cm.canvas.selection;
       const connectColor = window.matchMedia("(prefers-color-scheme: dark)")
         .matches
         ? "#dddddd"
@@ -172,7 +172,7 @@ function setupListeners(cm) {
         Tools.handleAddStation(e, cm);
         break;
       case "selectBtn":
-        Tools.handleSelectClick(e, cm);
+        cm.displayProperties();
         break;
       case "connectionBtn":
         if (cm.canvas.connecting) {
@@ -180,7 +180,6 @@ function setupListeners(cm) {
           // if yes, add that as the end point
           // if not, remove the line
           let validConnection = false;
-          // TODO - 3rd time we have the offset then mouse thing. just put it in a function
           const offset = cm.canvas.getMouseOffset();
           let mouse = getEventMouseCoords(e, offset);
           const shapes = cm.canvas.shapes;

@@ -10,7 +10,7 @@ export default class Station {
   #zcoord = 0;
   #smallPadding = 5;
   #largePadding = 12;
-  #id = null; // TODO need way to get and increment snum
+  #id = null;
   #connections = new Array();
   type = "station";
 
@@ -180,13 +180,5 @@ export default class Station {
 
   set connections(c) {
     this.#connections = c;
-  }
-
-  updateValues() {
-    console.log("todo update values");
-    // this.name = $("#stNameInput").val();
-    // this.xcoord = $("#stXInput").val();
-    // this.ycoord = $("#stYInput").val();
-    // this.zcoord = $("#stZInput").val();
   }
 }

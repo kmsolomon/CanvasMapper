@@ -45,13 +45,6 @@ function handleAddStation(e, cm) {
   cm.displayProperties();
 }
 
-// TODO might get rid of this
-function handleSelectClick(e, cm) {
-  // update selection?
-  // show properties
-  cm.displayProperties();
-}
-
 function handleSelectMouseDown(e, cm) {
   const selection = cm.canvas.selection;
   if (selection) {
@@ -67,10 +60,4 @@ function handleSelectMouseDown(e, cm) {
   cm.displayProperties();
 }
 
-export {
-  handleAddStation,
-  handleSelectClick,
-  handleSelectMouseDown,
-  changeTool,
-  deletePart,
-};
+export { handleAddStation, handleSelectMouseDown, changeTool, deletePart };
