@@ -1,10 +1,14 @@
 import Station from "./station";
 import Connection from "./connection";
 
-function exportAsPNG() {
-  const canvas = document.getElementById("workspace");
-  const dataURL = canvas.toDataURL("image/png");
+function exportAsPNG(mapper) {
+  const canvas = mapper.canvas;
 
+  mapper.selection = null;
+  mapper.valid = false;
+  mapper.draw(); // redraw so selection isn't shown on the downloaded image
+
+  const dataURL = canvas.toDataURL("image/png");
   const a = document.createElement("a");
   a.href = dataURL;
   a.download = "canvasMap.png";

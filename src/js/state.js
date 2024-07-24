@@ -16,7 +16,8 @@ export default class CanvasState {
   #dragoffx = 0;
   #dragoffy = 0;
   #myState = this;
-  #selectionColor = "#CC0000";
+  #selectionColor = "#3e6659";
+  #selectionOffset = 2;
   #selectionWidth = 2;
   #interval = 30;
   #bgColor = "#FFFFFF";
@@ -243,14 +244,17 @@ export default class CanvasState {
         }
       }
 
-      // draw selection
-      // right now this is just a stroke along the edge of the selected Shape
-      // TODO would like selection to be a separate shape so it doesn't interfere with user-selected borders
+      // draw selection (a separate stroke-only rectangle around the station)
       if (this.#selection != null) {
         ctx.strokeStyle = this.#selectionColor;
         ctx.lineWidth = this.#selectionWidth;
         const mySel = this.#selection;
-        ctx.strokeRect(mySel.x, mySel.y, mySel.w, mySel.h);
+        ctx.strokeRect(
+          mySel.x - this.#selectionOffset,
+          mySel.y - this.#selectionOffset,
+          mySel.w + 2 * this.#selectionOffset,
+          mySel.h + 2 * this.#selectionOffset
+        );
       }
 
       this.#valid = true;
@@ -279,8 +283,10 @@ export default class CanvasState {
   enableDarkMode(b) {
     if (b) {
       this.#bgColor = "#343434";
+      this.#selectionColor = "#dcefe6";
     } else {
       this.#bgColor = "#FFFFFF";
+      this.#selectionColor = "#3e6659";
     }
     this.#valid = false;
   }

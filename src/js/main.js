@@ -30,7 +30,7 @@ function setupListeners(cm) {
     cm.redo();
   });
   document.getElementById("downloadPNG").addEventListener("click", function () {
-    exportAsPNG();
+    exportAsPNG(cm.canvas);
   });
   document
     .getElementById("downloadJSON")
