@@ -3,6 +3,7 @@ export default class Connection {
   #end;
   #color;
   #width;
+  #stationMidpoint = 15;
   #padding = 2;
   #id;
   type = "connection";
@@ -56,10 +57,16 @@ export default class Connection {
     ctx.strokeStyle = this.#color;
     ctx.lineWidth = this.#width;
     ctx.beginPath();
-    // TODO why 15? and should switch that to variable
-    ctx.moveTo(this.#start.x + 15, this.#start.y + 15); // will eventually want to do some fixing up to make sure the line starts on the correct side
+
+    ctx.moveTo(
+      this.#start.x + this.#stationMidpoint,
+      this.#start.y + this.#stationMidpoint
+    );
     if (this.#end.type == "station") {
-      ctx.lineTo(this.#end.x + 15, this.#end.y + 15);
+      ctx.lineTo(
+        this.#end.x + this.#stationMidpoint,
+        this.#end.y + this.#stationMidpoint
+      );
     } else {
       ctx.lineTo(this.#end.x, this.#end.y);
     }
