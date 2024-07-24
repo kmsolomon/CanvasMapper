@@ -9,7 +9,7 @@ export default class Station {
   #ycoord = 0;
   #zcoord = 0;
   #smallPadding = 5;
-  #largePadding = 10;
+  #largePadding = 12;
   #id = null; // TODO need way to get and increment snum
   #connections = new Array();
   type = "station";
@@ -55,7 +55,7 @@ export default class Station {
       ).matches;
       const textBg = isDarkMode ? "#343434" : "#FFFFFF";
       const textColor = isDarkMode ? "#dddddd" : "#000000";
-      ctx.font = "12px Courier";
+      ctx.font = "12px sans-serif";
       const metrics = ctx.measureText(this.#name);
       const center = metrics.width / 2 - 15;
       const halfStation = this.#w / 2;
