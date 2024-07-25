@@ -155,6 +155,9 @@ function setupListeners(cm) {
       Tools.handleShapeMove(e, cm);
     }
     if (cm.canvas.connecting) {
+      const offset = cm.canvas.getMouseOffset();
+      let mouse = getEventMouseCoords(e, offset);
+
       cm.canvas.activeLine.end.x = mouse.x;
       cm.canvas.activeLine.end.y = mouse.y;
       cm.canvas.valid = false;
