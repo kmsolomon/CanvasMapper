@@ -90,7 +90,6 @@ export default class CanvasMapper {
       clone
         .querySelector("#stColorField")
         .addEventListener("change", function (e) {
-          // TODO props change history step
           selectedShape.fill = e.target.value;
           cm.lastStationFill = e.target.value;
           canvas.valid = false;
@@ -98,22 +97,18 @@ export default class CanvasMapper {
       clone
         .querySelector("#stNameInput")
         .addEventListener("change", function (e) {
-          // TODO props change history step
           selectedShape.name = e.target.value;
           canvas.valid = false;
         });
       clone.querySelector("#stXInput").addEventListener("change", function (e) {
-        // TODO props change history step
         selectedShape.xcoord = e.target.value;
         canvas.valid = false;
       });
       clone.querySelector("#stYInput").addEventListener("change", function (e) {
-        // TODO props change history step
         selectedShape.ycoord = e.target.value;
         canvas.valid = false;
       });
       clone.querySelector("#stZInput").addEventListener("change", function (e) {
-        // TODO props change history step
         selectedShape.zcoord = e.target.value;
         canvas.valid = false;
       });
@@ -156,29 +151,29 @@ export default class CanvasMapper {
         const l = this.#canvas.shapes.length;
         const currentSpot = {};
         for (let i = l - 1; i >= 0; i--) {
-          if (this.#canvas.shapes[i].id === u.object.id) {
+          if (this.#canvas.shapes[i].id === u.obj.id) {
             currentSpot.x = this.#canvas.shapes[i].x;
             currentSpot.y = this.#canvas.shapes[i].y;
           }
         }
-        this.#canvas.modifyShape(u.object.id, u.object.x, u.object.y);
-        u.object.x = currentSpot.x;
-        u.object.y = currentSpot.y;
+        this.#canvas.modifyShape(u.obj.id, u.obj.x, u.obj.y);
+        u.obj.x = currentSpot.x;
+        u.obj.y = currentSpot.y;
       }
       this.#redoHistory.push(u);
 
       if (u.type === "add") {
         this.#canvas.selection = null;
         this.clearDisplayProps();
-        this.#canvas.removeShape(u.object);
+        this.#canvas.removeShape(u.obj);
       } else if (u.type === "delete") {
-        this.#canvas.addShape(u.object);
-        const l = u.object.connections.length;
+        this.#canvas.addShape(u.obj);
+        const l = u.obj.connections.length;
         for (let i = 0; i < l; i++) {
-          this.#canvas.addShape(u.object.connections[i]);
+          this.#canvas.addShape(u.obj.connections[i]);
         }
       } else if (u.type === "import") {
-        this.#canvas.removeShapes(u.object);
+        this.#canvas.removeShapes(u.obj);
       }
     }
   }
@@ -196,24 +191,24 @@ export default class CanvasMapper {
         const l = this.#canvas.shapes.length;
         const currentSpot = {};
         for (let i = l - 1; i >= 0; i--) {
-          if (this.#canvas.shapes[i].id === r.object.id) {
+          if (this.#canvas.shapes[i].id === r.obj.id) {
             currentSpot.x = this.#canvas.shapes[i].x;
             currentSpot.y = this.#canvas.shapes[i].y;
           }
         }
-        this.#canvas.modifyShape(r.object.id, r.object.x, r.object.y);
-        r.object.x = currentSpot.x;
-        r.object.y = currentSpot.y;
+        this.#canvas.modifyShape(r.obj.id, r.obj.x, r.obj.y);
+        r.obj.x = currentSpot.x;
+        r.obj.y = currentSpot.y;
       }
       this.#undoHistory.push(r);
       if (r.type === "add") {
         this.#canvas.selection = null;
         this.clearDisplayProps();
-        this.#canvas.addShape(r.object);
+        this.#canvas.addShape(r.obj);
       } else if (r.type === "delete") {
-        this.#canvas.removeShape(r.object);
+        this.#canvas.removeShape(r.obj);
       } else if (r.type === "import") {
-        this.#canvas.addShapes(r.object);
+        this.#canvas.addShapes(r.obj);
       }
     }
   }
