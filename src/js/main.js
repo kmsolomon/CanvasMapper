@@ -146,14 +146,13 @@ function setupListeners(cm) {
   function handleCanvasMouseMove(e) {
     e.preventDefault();
     e.stopPropagation();
-    const offset = cm.canvas.getMouseOffset();
-    let mouse = getEventMouseCoords(e, offset);
 
-    if (cm.canvas.dragging && cm.canvas.selection) {
-      // Don't want to drag the object by its top-left corner, that's what offset is for
-      cm.canvas.selection.x = mouse.x - cm.canvas.dragoffx;
-      cm.canvas.selection.y = mouse.y - cm.canvas.dragoffy;
-      cm.canvas.valid = false; // Something's dragging so we must redraw
+    if (
+      cm.activeTool === "selectBtn" &&
+      cm.canvas.dragging &&
+      cm.canvas.selection
+    ) {
+      Tools.handleShapeMove(e, cm);
     }
     if (cm.canvas.connecting) {
       cm.canvas.activeLine.end.x = mouse.x;
@@ -172,7 +171,7 @@ function setupListeners(cm) {
         Tools.handleAddStation(e, cm);
         break;
       case "selectBtn":
-        cm.displayProperties();
+        Tools.handleShapeMoveEnd(e, cm);
         break;
       case "connectionBtn":
         if (cm.canvas.connecting) {

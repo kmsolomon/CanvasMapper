@@ -13,6 +13,7 @@ export default class CanvasState {
   #activeLine = null;
   #connecting = false; // know when we're drawing a connection
   #selection = null;
+  #moveStart = { x: null, y: null };
   #dragoffx = 0;
   #dragoffy = 0;
   #myState = this;
@@ -123,6 +124,16 @@ export default class CanvasState {
 
   set height(h) {
     this.#height = h;
+  }
+
+  set moveStart(coords) {
+    if (this.#dragging) {
+      this.#moveStart = coords;
+    }
+  }
+
+  get moveStart() {
+    return this.#moveStart;
   }
 
   addShape(shape) {

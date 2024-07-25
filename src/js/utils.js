@@ -15,3 +15,8 @@ export function getEventMouseCoords(e, offset = { x: 0, y: 0 }) {
   }
   return mouse;
 }
+
+export function roundNum(x) {
+  const multi = Math.pow(10, 2 || 0);
+  return Math.round(x * multi) / multi;
+}
