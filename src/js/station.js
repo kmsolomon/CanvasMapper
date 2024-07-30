@@ -49,7 +49,7 @@ export default class Station {
     ctx.fillStyle = this.#fill;
     ctx.fillRect(this.#x, this.#y, this.#w, this.#h);
 
-    if (this.#name !== null) {
+    if (this.#name !== null && this.#name !== "") {
       const isDarkMode = window.matchMedia(
         "(prefers-color-scheme: dark)"
       ).matches;
@@ -61,9 +61,9 @@ export default class Station {
       const halfStation = this.#w / 2;
       ctx.fillStyle = textBg;
       ctx.fillRect(
-        this.#x - center,
+        this.#x - center - 2,
         this.#y + this.#h,
-        metrics.width,
+        metrics.width + 4,
         halfStation
       );
       ctx.fillStyle = textColor;
@@ -75,7 +75,7 @@ export default class Station {
     }
   }
 
-  contains(mx, my) {
+  contains(mx, my, ctx) {
     return (
       this.#x <= mx &&
       this.#x + this.#w >= mx &&
