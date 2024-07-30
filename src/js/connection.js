@@ -28,8 +28,8 @@ export default class Connection {
       original.start,
       original.end,
       original.id,
-      original.cnum,
       original.color,
+      original.style,
       original.width
     );
     return cloned;
@@ -63,8 +63,7 @@ export default class Connection {
   set width(n) {
     if (n >= 1 && n <= 100) {
       this.#width = Math.floor(n);
-    }
-    if (n > 100) {
+    } else if (n > 100) {
       throw new Error("Error line width must be less than 100");
     } else {
       throw new Error("Error line width must be at least 1");
@@ -164,6 +163,7 @@ export default class Connection {
       end: this.#end,
       color: this.#color,
       width: this.#width,
+      style: this.#style,
     };
 
     return JSON.stringify(obj);

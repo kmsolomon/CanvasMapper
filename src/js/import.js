@@ -64,6 +64,7 @@ async function importFromJSON(evt, cm) {
           end,
           `${importIdPrefix}${cObj.id}`,
           cObj.color,
+          cObj.style,
           cObj.width
         );
 
