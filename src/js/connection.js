@@ -9,12 +9,13 @@ export default class Connection {
   #style = "solid";
   #id;
   type = "connection";
-  constructor(start, end, cnum, color = "#000000", width = 2) {
+  constructor(start, end, cnum, color = "#000000", style = "solid", width = 2) {
     this.#start = start;
     this.#end = end;
     this.#color = color;
     this.#width = width;
     this.#id = cnum;
+    this.#style = style;
 
     this.draw = this.draw.bind(this);
     this.contains = this.contains.bind(this);
@@ -60,7 +61,14 @@ export default class Connection {
   }
 
   set width(n) {
-    this.#width = Math.floor(n);
+    if (n >= 1 && n <= 100) {
+      this.#width = Math.floor(n);
+    }
+    if (n > 100) {
+      throw new Error("Error line width must be less than 100");
+    } else {
+      throw new Error("Error line width must be at least 1");
+    }
   }
 
   get style() {
@@ -68,7 +76,13 @@ export default class Connection {
   }
 
   set style(s) {
-    if (s === "solid" || s === "dash" || s === "dots") {
+    if (
+      s === "solid" ||
+      s === "dash" ||
+      s === "large-dash" ||
+      s === "dots" ||
+      s === "dash-dot"
+    ) {
       this.#style = s;
     }
   }
@@ -83,9 +97,27 @@ export default class Connection {
     }
   }
 
+  static getLinePattern(n) {
+    switch (n) {
+      case "solid":
+        return [];
+      case "dash":
+        return [6, 6];
+      case "large-dash":
+        return [20, 4];
+      case "dots":
+        return [2, 2];
+      case "dash-dot":
+        return [16, 4, 2, 4];
+      default:
+        return [];
+    }
+  }
+
   draw(ctx) {
     ctx.strokeStyle = this.#color;
     ctx.lineWidth = this.#width;
+    ctx.setLineDash(Connection.getLinePattern(this.#style));
     const path = new Path2D();
     path.moveTo(
       this.#start.x + this.#stationMidpoint,
@@ -101,6 +133,8 @@ export default class Connection {
     }
 
     ctx.stroke(path);
+    ctx.closePath();
+    ctx.setLineDash([]); // reset back to solid
     this.#path = path;
   }
 

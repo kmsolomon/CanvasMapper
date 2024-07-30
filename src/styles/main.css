@@ -315,7 +315,8 @@ button.active {
 }
 
 input[type="text"],
-input[type="number"] {
+input[type="number"],
+select {
   color: var(--primary-font);
   background-color: var(--input-bg);
   border: var(--border);

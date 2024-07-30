@@ -127,6 +127,10 @@ function setupListeners(cm) {
         .matches
         ? "#dddddd"
         : "#000000";
+      const connectStyle = cm.lastConnectionStyle
+        ? cm.lastConnectionStyle
+        : "solid";
+      const connectWidth = cm.lastConnectionWidth ? cm.lastConnectionWidth : 2;
       if (cm.lastConnectionColor !== null) {
         connectColor = cm.lastConnectionColor;
       }
@@ -134,7 +138,9 @@ function setupListeners(cm) {
         selection,
         mouse,
         `c${cm.cnum}`,
-        connectColor
+        connectColor,
+        connectStyle,
+        connectWidth
       );
       cm.incrementCNum();
       cm.canvas.connecting = true;

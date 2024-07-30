@@ -99,14 +99,16 @@
       <div id="connectionProperties">
         <div class="input-group">
           <label for="lineWidthInput">Line width: </label>
-          <input id="lineWidthInput" type="number" />
+          <input id="lineWidthInput" type="number" min="1" max="100" step="1" />
         </div>
         <div class="input-group">
           <label for="lineStyleInput">Line style: </label>
           <select id="lineStyleInput">
             <option value="solid">Solid</option>
-            <option value="dash">Dashed</option>
+            <option value="dash">Small dash</option>
+            <option value="large-dash">Large dash</option>
             <option value="dots">Dotted</option>
+            <option value="dash-dot">Dash-dot</option>
           </select>
         </div>
         <div class="input-group">

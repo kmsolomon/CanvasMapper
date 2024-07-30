@@ -9,6 +9,8 @@ export default class CanvasMapper {
   #imp = 0; // number of files imported to help avoid id conflicts
   #lastStationFill = "#00AA00";
   #lastConnectionColor = null;
+  #lastConnectionStyle = "solid";
+  #lastConnectionWidth = null;
   #canvas = null;
   #activeTool = "selectBtn";
 
@@ -62,6 +64,32 @@ export default class CanvasMapper {
   set lastConnectionColor(c) {
     if (/^#[0-9A-F]{6}$/i.test(c)) {
       this.#lastConnectionColor = c;
+    }
+  }
+
+  get lastConnectionStyle() {
+    return this.#lastConnectionStyle;
+  }
+
+  set lastConnectionStyle(s) {
+    if (
+      s === "solid" ||
+      s === "dash" ||
+      s === "large-dash" ||
+      s === "dot" ||
+      s === "dash-dot"
+    ) {
+      this.#lastConnectionStyle = s;
+    }
+  }
+
+  get lastConnectionWidth() {
+    return this.#lastConnectionWidth;
+  }
+
+  set lastConnectionWidth(n) {
+    if (typeof n === "number") {
+      this.#lastConnectionWidth = Math.floor(n);
     }
   }
 
@@ -138,7 +166,7 @@ export default class CanvasMapper {
       props.innerHTML = "";
 
       clone.querySelector("#lineColorField").value = selectedShape.color;
-      // clone.querySelector("#lineStyleInput").value = selectedShape.ycoord;
+      clone.querySelector("#lineStyleInput").value = selectedShape.style;
       clone.querySelector("#lineWidthInput").value = selectedShape.width;
 
       clone
@@ -151,10 +179,24 @@ export default class CanvasMapper {
       clone
         .querySelector("#lineWidthInput")
         .addEventListener("change", function (e) {
-          selectedShape.width = e.target.value;
+          try {
+            selectedShape.width = e.target.value;
+            cm.lastConnectionWidth = Number.parseInt(e.target.value);
+            canvas.valid = false;
+          } catch (err) {
+            console.error(err);
+            e.target.value = 1;
+            cm.lastConnectionWidth = 1;
+            canvas.valid = false;
+          }
+        });
+      clone
+        .querySelector("#lineStyleInput")
+        .addEventListener("change", function (e) {
+          selectedShape.style = e.target.value;
+          cm.lastConnectionStyle = e.target.value;
           canvas.valid = false;
         });
-      // TODO - style
       props.appendChild(clone);
     }
   }
