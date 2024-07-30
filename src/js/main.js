@@ -87,17 +87,16 @@ function setupListeners(cm) {
 
     if (tool === "selectBtn" || tool === "connectionBtn") {
       for (let i = shapes.length - 1; i >= 0; i--) {
-        if (shapes[i].contains(mouse.x, mouse.y)) {
+        if (shapes[i].contains(mouse.x, mouse.y, cm.canvas.canvas)) {
           const selectedShape = shapes[i];
 
           cm.canvas.selection = selectedShape;
-          cm.displayProperties();
+
           validSelection = true;
           // Keep track of where in the object we clicked
           // so we can move it smoothly (see mousemove)
           cm.canvas.dragoffx = mouse.x - selectedShape.x;
           cm.canvas.dragoffy = mouse.y - selectedShape.y;
-          break;
         }
       }
     }
@@ -120,15 +119,17 @@ function setupListeners(cm) {
     }
 
     if (tool === "selectBtn") {
-      cm.displayProperties();
       cm.canvas.valid = false; // force redraw
       Tools.handleSelectMouseDown(e, cm);
     } else if (tool === "connectionBtn" && cm.canvas.selection) {
       const selection = cm.canvas.selection;
-      const connectColor = window.matchMedia("(prefers-color-scheme: dark)")
+      let connectColor = window.matchMedia("(prefers-color-scheme: dark)")
         .matches
         ? "#dddddd"
         : "#000000";
+      if (cm.lastConnectionColor !== null) {
+        connectColor = cm.lastConnectionColor;
+      }
       const line = new Connection(
         selection,
         mouse,
@@ -187,6 +188,7 @@ function setupListeners(cm) {
           const shapes = cm.canvas.shapes;
           for (let i = shapes.length - 1; i >= 0; i--) {
             if (
+              shapes[i].type === "station" &&
               shapes[i].contains(mouse.x, mouse.y) &&
               shapes[i].id !== cm.canvas.selection.id
             ) {

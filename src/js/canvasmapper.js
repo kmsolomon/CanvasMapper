@@ -8,6 +8,7 @@ export default class CanvasMapper {
   #cnum = 0; // number we'll use for connection ids
   #imp = 0; // number of files imported to help avoid id conflicts
   #lastStationFill = "#00AA00";
+  #lastConnectionColor = null;
   #canvas = null;
   #activeTool = "selectBtn";
 
@@ -51,6 +52,16 @@ export default class CanvasMapper {
   set lastStationFill(c) {
     if (/^#[0-9A-F]{6}$/i.test(c)) {
       this.#lastStationFill = c;
+    }
+  }
+
+  get lastConnectionColor() {
+    return this.#lastConnectionColor;
+  }
+
+  set lastConnectionColor(c) {
+    if (/^#[0-9A-F]{6}$/i.test(c)) {
+      this.#lastConnectionColor = c;
     }
   }
 
@@ -112,6 +123,38 @@ export default class CanvasMapper {
         selectedShape.zcoord = e.target.value;
         canvas.valid = false;
       });
+      props.appendChild(clone);
+    } else if (
+      this.#canvas.selection &&
+      this.#canvas.selection.type === "connection"
+    ) {
+      const props = document.getElementById("propdiv");
+      const template = document.querySelector("#connectionProps");
+      const clone = template.content.cloneNode(true);
+      const selectedShape = this.#canvas.selection;
+      const canvas = this.#canvas;
+      const cm = this;
+
+      props.innerHTML = "";
+
+      clone.querySelector("#lineColorField").value = selectedShape.color;
+      // clone.querySelector("#lineStyleInput").value = selectedShape.ycoord;
+      clone.querySelector("#lineWidthInput").value = selectedShape.width;
+
+      clone
+        .querySelector("#lineColorField")
+        .addEventListener("change", function (e) {
+          selectedShape.color = e.target.value;
+          cm.lastConnectionColor = e.target.value;
+          canvas.valid = false;
+        });
+      clone
+        .querySelector("#lineWidthInput")
+        .addEventListener("change", function (e) {
+          selectedShape.width = e.target.value;
+          canvas.valid = false;
+        });
+      // TODO - style
       props.appendChild(clone);
     }
   }

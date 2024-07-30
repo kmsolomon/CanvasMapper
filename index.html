@@ -95,6 +95,26 @@
         </div>
       </div>
     </template>
+    <template id="connectionProps">
+      <div id="connectionProperties">
+        <div class="input-group">
+          <label for="lineWidthInput">Line width: </label>
+          <input id="lineWidthInput" type="number" />
+        </div>
+        <div class="input-group">
+          <label for="lineStyleInput">Line style: </label>
+          <select id="lineStyleInput">
+            <option value="solid">Solid</option>
+            <option value="dash">Dashed</option>
+            <option value="dots">Dotted</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label for="lineColorField">Color: </label>
+          <input id="lineColorField" type="color" />
+        </div>
+      </div>
+    </template>
     <script type="module" src="/src/js/main.js"></script>
   </body>
 </html>

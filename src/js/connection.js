@@ -4,7 +4,9 @@ export default class Connection {
   #color;
   #width;
   #stationMidpoint = 15;
+  #path;
   #padding = 2;
+  #style = "solid";
   #id;
   type = "connection";
   constructor(start, end, cnum, color = "#000000", width = 2) {
@@ -53,37 +55,67 @@ export default class Connection {
     return this.#id;
   }
 
+  get width() {
+    return this.#width;
+  }
+
+  set width(n) {
+    this.#width = Math.floor(n);
+  }
+
+  get style() {
+    return this.#style;
+  }
+
+  set style(s) {
+    if (s === "solid" || s === "dash" || s === "dots") {
+      this.#style = s;
+    }
+  }
+
+  get color() {
+    return this.#color;
+  }
+
+  set color(n) {
+    if (/^#[0-9A-F]{6}$/i.test(n)) {
+      this.#color = n;
+    }
+  }
+
   draw(ctx) {
     ctx.strokeStyle = this.#color;
     ctx.lineWidth = this.#width;
-    ctx.beginPath();
-
-    ctx.moveTo(
+    const path = new Path2D();
+    path.moveTo(
       this.#start.x + this.#stationMidpoint,
       this.#start.y + this.#stationMidpoint
     );
     if (this.#end.type == "station") {
-      ctx.lineTo(
+      path.lineTo(
         this.#end.x + this.#stationMidpoint,
         this.#end.y + this.#stationMidpoint
       );
     } else {
-      ctx.lineTo(this.#end.x, this.#end.y);
+      path.lineTo(this.#end.x, this.#end.y);
     }
-    ctx.stroke();
+
+    ctx.stroke(path);
+    this.#path = path;
   }
 
-  // TODO - I have no idea where the x and y were coming from????
-  // TODO - is this still needed?
   contains(mx, my) {
-    console.log("connection contains!");
-    return false;
-    // return (
-    //   this.#x <= mx &&
-    //   this.#x + this.#padding >= mx &&
-    //   this.#y <= my &&
-    //   this.#y + this.#padding >= my
-    // );
+    const canvas = document.getElementById("workspace");
+    const ctx = canvas.getContext("2d");
+    let contained = false;
+    if (this.#width < 6) {
+      ctx.lineWidth = 6; // tolerance to make it easier to select a line
+    } else {
+      ctx.lineWidth = this.#width;
+    }
+    contained = ctx.isPointInStroke(this.#path, mx, my);
+    ctx.lineWidth = this.#width;
+    return contained;
   }
 
   includes(s) {
