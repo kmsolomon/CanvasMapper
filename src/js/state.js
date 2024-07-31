@@ -44,10 +44,6 @@ export default class CanvasState {
         .slice(0, -2),
       10
     );
-
-    // setInterval(function () {
-    //   this.draw();
-    // }, this.#interval);
   }
 
   get dragging() {
@@ -260,12 +256,55 @@ export default class CanvasState {
         ctx.strokeStyle = this.#selectionColor;
         ctx.lineWidth = this.#selectionWidth;
         const mySel = this.#selection;
-        ctx.strokeRect(
-          mySel.x - this.#selectionOffset,
-          mySel.y - this.#selectionOffset,
-          mySel.w + 2 * this.#selectionOffset,
-          mySel.h + 2 * this.#selectionOffset
-        );
+
+        if (mySel.shape === "square") {
+          ctx.strokeRect(
+            mySel.x - this.#selectionOffset,
+            mySel.y - this.#selectionOffset,
+            mySel.w + 2 * this.#selectionOffset,
+            mySel.h + 2 * this.#selectionOffset
+          );
+        } else if (mySel.shape === "circle") {
+          const path = new Path2D();
+          const xCenter = mySel.x + mySel.w / 2;
+          const yCenter = mySel.y + mySel.h / 2;
+          path.arc(xCenter, yCenter, mySel.w / 2 + 3, 0, 2 * Math.PI, false);
+          ctx.stroke(path);
+          ctx.closePath();
+        } else if (mySel.shape === "triangle") {
+          const path = new Path2D();
+          path.moveTo(mySel.x + mySel.w / 2, mySel.y - 5);
+          path.lineTo(
+            mySel.x + mySel.w + mySel.w / 5 + 5,
+            mySel.y + mySel.h + 2.5
+          );
+          path.lineTo(mySel.x - mySel.w / 5 - 5, mySel.y + mySel.h + 2.5);
+          path.closePath();
+          ctx.stroke(path);
+        } else if (mySel.shape === "diamond") {
+          const path = new Path2D();
+          path.moveTo(mySel.x + mySel.w / 2, mySel.y - 4);
+          path.lineTo(mySel.x + mySel.w + 4, mySel.y + mySel.h / 2);
+          path.lineTo(mySel.x + mySel.w / 2, mySel.y + mySel.h + 4);
+          path.lineTo(mySel.x - 4, mySel.y + mySel.h / 2);
+          path.closePath();
+          ctx.stroke(path);
+        } else if (mySel.shape === "star") {
+          const path = new Path2D();
+          const points = 5;
+          const starX = mySel.x + mySel.w / 2;
+          const starY = mySel.y + mySel.w / 2;
+          const starRadius = mySel.w / 1.5 + 6;
+
+          path.moveTo(starX, starY - starRadius);
+          for (let i = 0; i < 2 * points + 1; i++) {
+            const r = i % 2 == 0 ? starRadius : starRadius / 2;
+            const a = (Math.PI * i) / points;
+            path.lineTo(starX - r * Math.sin(a), starY - r * Math.cos(a));
+          }
+          path.closePath();
+          ctx.stroke(path);
+        }
       }
 
       this.#valid = true;

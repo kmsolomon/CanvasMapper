@@ -8,6 +8,7 @@ export default class CanvasMapper {
   #cnum = 0; // number we'll use for connection ids
   #imp = 0; // number of files imported to help avoid id conflicts
   #lastStationFill = "#00AA00";
+  #lastStationShape = "square";
   #lastConnectionColor = null;
   #lastConnectionStyle = "solid";
   #lastConnectionWidth = null;
@@ -93,6 +94,22 @@ export default class CanvasMapper {
     }
   }
 
+  get lastStationShape() {
+    return this.#lastStationShape;
+  }
+
+  set lastStationShape(s) {
+    if (
+      s === "square" ||
+      s === "circle" ||
+      s === "triangle" ||
+      s === "diamond" ||
+      s === "star"
+    ) {
+      this.#lastStationShape = s;
+    }
+  }
+
   get imp() {
     return this.#imp;
   }
@@ -125,6 +142,7 @@ export default class CanvasMapper {
       clone.querySelector("#stXInput").value = selectedShape.xcoord;
       clone.querySelector("#stYInput").value = selectedShape.ycoord;
       clone.querySelector("#stZInput").value = selectedShape.zcoord;
+      clone.querySelector("#stShapeSelect").value = selectedShape.shape;
 
       clone
         .querySelector("#stColorField")
@@ -151,6 +169,13 @@ export default class CanvasMapper {
         selectedShape.zcoord = e.target.value;
         canvas.valid = false;
       });
+      clone
+        .querySelector("#stShapeSelect")
+        .addEventListener("change", function (e) {
+          selectedShape.shape = e.target.value;
+          cm.lastStationShape = e.target.value;
+          canvas.valid = false;
+        });
       props.appendChild(clone);
     } else if (
       this.#canvas.selection &&

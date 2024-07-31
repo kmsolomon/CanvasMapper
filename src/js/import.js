@@ -44,7 +44,8 @@ async function importFromJSON(evt, cm) {
           sObj.w,
           sObj.h,
           sObj.fill,
-          `${importIdPrefix}${sObj.id}`
+          `${importIdPrefix}${sObj.id}`,
+          sObj.shape
         );
         s.name = sObj.name;
         s.xcoord = sObj.xcoord;

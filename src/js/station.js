@@ -10,11 +10,13 @@ export default class Station {
   #zcoord = 0;
   #smallPadding = 5;
   #largePadding = 12;
+  #path = null;
+  #shape = "square";
   #id = null;
   #connections = new Array();
   type = "station";
 
-  constructor(x, y, w, h, fill, snum) {
+  constructor(x, y, w, h, fill, snum, shape = "square") {
     this.#x = x;
     this.#y = y;
     this.#w = w;
@@ -23,6 +25,15 @@ export default class Station {
       this.#fill = fill;
     }
     this.#id = snum;
+    if (
+      shape === "square" ||
+      shape === "circle" ||
+      shape === "diamond" ||
+      shape === "triangle" ||
+      shape === "star"
+    ) {
+      this.#shape = shape;
+    }
     this.draw = this.draw.bind(this);
     this.contains = this.contains.bind(this);
     this.toJSON = this.toJSON.bind(this);
@@ -35,7 +46,8 @@ export default class Station {
       original.w,
       original.h,
       original.fill,
-      original.id
+      original.id,
+      original.shape
     );
     cloned.name = original.name;
     cloned.xcoord = original.xcoord;
@@ -47,7 +59,51 @@ export default class Station {
 
   draw(ctx) {
     ctx.fillStyle = this.#fill;
-    ctx.fillRect(this.#x, this.#y, this.#w, this.#h);
+    // drawing square
+    if (this.#shape === null || this.#shape === "square") {
+      ctx.fillRect(this.#x, this.#y, this.#w, this.#h);
+    } else if (this.#shape === "circle") {
+      const path = new Path2D();
+      const xCenter = this.#x + this.#w / 2;
+      const yCenter = this.#y + this.#h / 2;
+      path.arc(xCenter, yCenter, this.#w / 2, 0, 2 * Math.PI, false);
+      ctx.fill(path);
+      ctx.closePath();
+      this.#path = path;
+    } else if (this.#shape === "diamond") {
+      const path = new Path2D();
+      path.moveTo(this.#x + this.#w / 2, this.#y);
+      path.lineTo(this.#x + this.#w, this.#y + this.#h / 2);
+      path.lineTo(this.#x + this.#w / 2, this.#y + this.#h);
+      path.lineTo(this.#x, this.#y + this.#h / 2);
+      path.closePath();
+      this.#path = path;
+      ctx.fill(path);
+    } else if (this.#shape === "triangle") {
+      const path = new Path2D();
+      path.moveTo(this.#x + this.#w / 2, this.#y);
+      path.lineTo(this.#x + this.#w + this.#w / 5, this.#y + this.#h);
+      path.lineTo(this.#x - this.#w / 5, this.#y + this.#h);
+      path.closePath();
+      this.#path = path;
+      ctx.fill(path);
+    } else if (this.#shape === "star") {
+      const starX = this.#x + this.#w / 2;
+      const starY = this.#y + this.#w / 2;
+      const starRadius = this.#w / 1.5;
+      const path = new Path2D();
+      const points = 5;
+
+      path.moveTo(starX, starY - starRadius);
+      for (let i = 0; i < 2 * points + 1; i++) {
+        const r = i % 2 == 0 ? starRadius : starRadius / 2;
+        const a = (Math.PI * i) / points;
+        path.lineTo(starX - r * Math.sin(a), starY - r * Math.cos(a));
+      }
+      path.closePath();
+      this.#path = path;
+      ctx.fill(path);
+    }
 
     if (this.#name !== null && this.#name !== "") {
       const isDarkMode = window.matchMedia(
@@ -75,13 +131,19 @@ export default class Station {
     }
   }
 
-  contains(mx, my, ctx) {
-    return (
-      this.#x <= mx &&
-      this.#x + this.#w >= mx &&
-      this.#y <= my &&
-      this.#y + this.#h >= my
-    );
+  contains(mx, my) {
+    if (this.#shape === "square") {
+      return (
+        this.#x <= mx &&
+        this.#x + this.#w >= mx &&
+        this.#y <= my &&
+        this.#y + this.#h >= my
+      );
+    } else {
+      const canvas = document.getElementById("workspace");
+      const ctx = canvas.getContext("2d");
+      return ctx.isPointInPath(this.#path, mx, my);
+    }
   }
 
   toJSON() {
@@ -97,6 +159,7 @@ export default class Station {
       xcoord: this.#xcoord,
       ycoord: this.#ycoord,
       zcoord: this.#zcoord,
+      shape: this.#shape,
       smallPadding: this.#smallPadding,
       largePadding: this.#largePadding,
       connections: this.#connections,
@@ -180,5 +243,23 @@ export default class Station {
 
   set connections(c) {
     this.#connections = c;
+  }
+
+  get shape() {
+    return this.#shape;
+  }
+
+  set shape(s) {
+    if (
+      s === "square" ||
+      s === "circle" ||
+      s === "triangle" ||
+      s === "diamond" ||
+      s === "star"
+    ) {
+      this.#shape = s;
+    } else {
+      throw new Error(`Invalid station shape: ${s}`);
+    }
   }
 }
