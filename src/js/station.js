@@ -4,6 +4,7 @@ export default class Station {
   #w = 1;
   #h = 1;
   #fill = "#AAAAAA";
+  #borderColor = "#AAAAAA";
   #name = null;
   #xcoord = 0;
   #ycoord = 0;
@@ -16,7 +17,7 @@ export default class Station {
   #connections = new Array();
   type = "station";
 
-  constructor(x, y, w, h, fill, snum, shape = "square") {
+  constructor(x, y, w, h, fill, snum, shape = "square", borderColor) {
     this.#x = x;
     this.#y = y;
     this.#w = w;
@@ -34,6 +35,9 @@ export default class Station {
     ) {
       this.#shape = shape;
     }
+    if (/^#[0-9A-F]{6}$/i.test(borderColor)) {
+      this.#borderColor = borderColor;
+    }
     this.draw = this.draw.bind(this);
     this.contains = this.contains.bind(this);
     this.toJSON = this.toJSON.bind(this);
@@ -47,7 +51,8 @@ export default class Station {
       original.h,
       original.fill,
       original.id,
-      original.shape
+      original.shape,
+      original.borderColor
     );
     cloned.name = original.name;
     cloned.xcoord = original.xcoord;
@@ -59,15 +64,20 @@ export default class Station {
 
   draw(ctx) {
     ctx.fillStyle = this.#fill;
+    ctx.strokeStyle = this.#borderColor;
+    ctx.lineWidth = 2;
     // drawing square
     if (this.#shape === null || this.#shape === "square") {
       ctx.fillRect(this.#x, this.#y, this.#w, this.#h);
+      ctx.strokeStyle = this.#borderColor;
+      ctx.strokeRect(this.#x, this.#y, this.#w, this.#h);
     } else if (this.#shape === "circle") {
       const path = new Path2D();
       const xCenter = this.#x + this.#w / 2;
       const yCenter = this.#y + this.#h / 2;
       path.arc(xCenter, yCenter, this.#w / 2, 0, 2 * Math.PI, false);
       ctx.fill(path);
+      ctx.stroke(path);
       ctx.closePath();
       this.#path = path;
     } else if (this.#shape === "diamond") {
@@ -79,6 +89,7 @@ export default class Station {
       path.closePath();
       this.#path = path;
       ctx.fill(path);
+      ctx.stroke(path);
     } else if (this.#shape === "triangle") {
       const path = new Path2D();
       path.moveTo(this.#x + this.#w / 2, this.#y);
@@ -87,6 +98,7 @@ export default class Station {
       path.closePath();
       this.#path = path;
       ctx.fill(path);
+      ctx.stroke(path);
     } else if (this.#shape === "star") {
       const starX = this.#x + this.#w / 2;
       const starY = this.#y + this.#w / 2;
@@ -103,6 +115,7 @@ export default class Station {
       path.closePath();
       this.#path = path;
       ctx.fill(path);
+      ctx.stroke(path);
     }
 
     if (this.#name !== null && this.#name !== "") {
@@ -160,6 +173,7 @@ export default class Station {
       ycoord: this.#ycoord,
       zcoord: this.#zcoord,
       shape: this.#shape,
+      borderColor: this.#borderColor,
       smallPadding: this.#smallPadding,
       largePadding: this.#largePadding,
       connections: this.#connections,
@@ -260,6 +274,16 @@ export default class Station {
       this.#shape = s;
     } else {
       throw new Error(`Invalid station shape: ${s}`);
+    }
+  }
+
+  get borderColor() {
+    return this.#borderColor;
+  }
+
+  set borderColor(c) {
+    if (/^#[0-9A-F]{6}$/i.test(c)) {
+      this.#borderColor = c;
     }
   }
 }

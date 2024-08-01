@@ -325,3 +325,8 @@ select {
   font-size: 1rem;
   max-width: 100%;
 }
+
+.input-group-group {
+  display: flex;
+  justify-content: space-between;
+}

@@ -9,6 +9,7 @@ export default class CanvasMapper {
   #imp = 0; // number of files imported to help avoid id conflicts
   #lastStationFill = "#00AA00";
   #lastStationShape = "square";
+  #lastBorderColor = "#00AA00";
   #lastConnectionColor = null;
   #lastConnectionStyle = "solid";
   #lastConnectionWidth = null;
@@ -65,6 +66,16 @@ export default class CanvasMapper {
   set lastConnectionColor(c) {
     if (/^#[0-9A-F]{6}$/i.test(c)) {
       this.#lastConnectionColor = c;
+    }
+  }
+
+  get lastBorderColor() {
+    return this.#lastBorderColor;
+  }
+
+  set lastBorderColor(c) {
+    if (/^#[0-9A-F]{6}$/i.test(c)) {
+      this.#lastBorderColor = c;
     }
   }
 
@@ -138,6 +149,8 @@ export default class CanvasMapper {
       props.innerHTML = "";
       // get the name/coords/color from station and update fields before appending
       clone.querySelector("#stColorField").value = selectedShape.fill;
+      clone.querySelector("#stBorderColorField").value =
+        selectedShape.borderColor;
       clone.querySelector("#stNameInput").value = selectedShape.name;
       clone.querySelector("#stXInput").value = selectedShape.xcoord;
       clone.querySelector("#stYInput").value = selectedShape.ycoord;
@@ -149,6 +162,13 @@ export default class CanvasMapper {
         .addEventListener("change", function (e) {
           selectedShape.fill = e.target.value;
           cm.lastStationFill = e.target.value;
+          canvas.valid = false;
+        });
+      clone
+        .querySelector("#stBorderColorField")
+        .addEventListener("change", function (e) {
+          selectedShape.borderColor = e.target.value;
+          cm.lastBorderColor = e.target.value;
           canvas.valid = false;
         });
       clone

@@ -35,7 +35,8 @@ function handleAddStation(e, cm) {
     30,
     cm.lastStationFill,
     `s${cm.snum}`,
-    cm.lastStationShape
+    cm.lastStationShape,
+    cm.lastBorderColor
   );
   cm.incrementSNum();
   cm.addToUndoHistory(new HistoryStep("add", newStation));
