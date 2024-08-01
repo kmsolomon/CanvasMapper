@@ -48,7 +48,6 @@ export default class Connection {
   }
 
   set end(e) {
-    // TODO, checking end is a valid station/obj
     this.#end = e;
   }
 

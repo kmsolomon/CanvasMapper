@@ -16,13 +16,11 @@ export default class CanvasState {
   #moveStart = { x: null, y: null };
   #dragoffx = 0;
   #dragoffy = 0;
-  #myState = this;
   #selectionColor = "#3e6659";
   #selectionOffset = 2;
   #selectionWidth = 2;
   #interval = 30;
   #bgColor = "#FFFFFF";
-  // TODO -- I feel like there's a better way to do this/shouldn't be accessing these within the state
   #htmlTop = document.body.parentNode.offsetTop;
   #htmlLeft = document.body.parentNode.offsetLeft;
 
@@ -209,23 +207,19 @@ export default class CanvasState {
       ctx.fillStyle = this.#bgColor;
       ctx.fillRect(0, 0, this.#width, this.#height); // Draw white background so it's not transparent when downloaded
       // draw all shapes
-      // TODO REFACTOR -- Why is the loop for connections and stations separate?
       // want to draw connections first
       for (const shape of shapes) {
         if (shape === undefined) {
           console.error("something went wrong");
           return;
         }
-        if (shape.type == "connection") {
-          // We can skip the drawing of elements that have moved off the screen:
-          if (
-            shape.x > this.#width ||
-            shape.y > this.#height ||
-            shape.x + shape.w < 0 ||
-            shape.y + shape.h < 0
-          ) {
-            continue;
-          }
+        if (
+          shape.type === "connection" &&
+          shape.start.x + shape.start.w >= 0 &&
+          shape.start.y + shape.start.h >= 0 &&
+          shape.start.x <= this.#width &&
+          shape.start.y <= this.#height
+        ) {
           shape.draw(ctx);
         }
       }
@@ -236,17 +230,13 @@ export default class CanvasState {
           console.error("Something went wrong while drawing");
           return;
         }
-        if (shape.type == "station") {
-          // We can skip the drawing of elements that have moved off the screen:
-          // TODO -- could clean this up
-          if (
-            shape.x > this.#width ||
-            shape.y > this.#height ||
-            shape.x + shape.w < 0 ||
-            shape.y + shape.h < 0
-          ) {
-            continue;
-          }
+        if (
+          shape.type === "station" &&
+          shape.x <= this.#width &&
+          shape.y <= this.#height &&
+          shape.x + shape.w >= 0 &&
+          shape.y + shape.h >= 0
+        ) {
           shape.draw(ctx);
         }
       }

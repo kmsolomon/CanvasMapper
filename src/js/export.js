@@ -30,7 +30,6 @@ function exportAsJSON(canvasState) {
     // for each of the connections, we want to add the id to an array
     // and also replace the start and end with the station ids
     for (const connection of shape.connections) {
-      // TODO do we want a separate simplified type where start/end are strings instead of station objects?
       const copy = Connection.clone(connection);
       copy.start = connection.start.id;
       copy.end = connection.end.id;

@@ -62,17 +62,7 @@ function setupListeners(cm) {
   });
 
   /***  Canvas Listeners  ***/
-  // fixes double clicking causing text not on canvas to get selected // TODO -- later verify if still needed
   const canvas = cm.canvas.canvas;
-  //const test = cm;
-  canvas.addEventListener(
-    "selectstart",
-    function (e) {
-      e.preventDefault();
-      return false;
-    },
-    false
-  );
 
   function handleCanvasMouseDown(e) {
     e.preventDefault();
