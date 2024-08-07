@@ -7,6 +7,7 @@ import { exportAsJSON, exportAsPNG } from "./export";
 import { importFromJSON } from "./import";
 import { getEventMouseCoords } from "./utils";
 import Station from "./station";
+import { loadDemo } from "./demo";
 
 function setupListeners(cm: CanvasMapper) {
   /***  Buttons  ***/
@@ -55,6 +56,9 @@ function setupListeners(cm: CanvasMapper) {
         target.value = "";
       }
     });
+  document.getElementById("loadDemo")?.addEventListener("click", function () {
+    loadDemo(cm);
+  });
 
   window.addEventListener("resize", function () {
     const canvas = <HTMLCanvasElement>document.getElementById("workspace");
