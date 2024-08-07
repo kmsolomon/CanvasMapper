@@ -138,14 +138,14 @@ export default class CanvasState {
   }
 
   removeShape(shape: Station | Connection) {
-    const l = this.#shapes.length;
+    const filteredShapes = this.#shapes.filter((s) => s.id !== shape.id);
+    const l = filteredShapes.length;
+    this.#selection = null;
+    this.#valid = false;
+    this.#shapes = filteredShapes;
+
     for (let i = l - 1; i >= 0; i--) {
-      const checkShape = this.#shapes[i];
-      if (checkShape.id === shape.id) {
-        this.#selection = null;
-        this.#valid = false;
-        this.#shapes = this.#shapes.filter((s) => s.id !== shape.id);
-      }
+      const checkShape = filteredShapes[i];
       if (
         shape instanceof Station &&
         checkShape instanceof Connection &&

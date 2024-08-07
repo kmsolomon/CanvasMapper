@@ -156,13 +156,14 @@ export default class Connection {
   }
 
   includes(s: Station): boolean {
-    if (this.#start instanceof Station) {
-      return this.#start.id === s.id;
-    } else if (this.#end instanceof Station) {
-      return this.#end.id === s.id;
-    } else {
-      return false;
+    let hasStation = false;
+    if (this.#start instanceof Station && this.#start.id === s.id) {
+      hasStation = true;
     }
+    if (this.#end instanceof Station && this.#end.id === s.id) {
+      hasStation = true;
+    }
+    return hasStation;
   }
 
   toJSON(): string {
