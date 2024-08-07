@@ -6,54 +6,58 @@ import HistoryStep from "./historystep";
 import { exportAsJSON, exportAsPNG } from "./export";
 import { importFromJSON } from "./import";
 import { getEventMouseCoords } from "./utils";
+import Station from "./station";
 
-function setupListeners(cm) {
+function setupListeners(cm: CanvasMapper) {
   /***  Buttons  ***/
-  document.getElementById("selectBtn").addEventListener("click", function () {
+  document.getElementById("selectBtn")?.addEventListener("click", function () {
     Tools.changeTool("selectBtn", cm);
   });
-  document.getElementById("stationBtn").addEventListener("click", function () {
+  document.getElementById("stationBtn")?.addEventListener("click", function () {
     Tools.changeTool("stationBtn", cm);
   });
   document
     .getElementById("connectionBtn")
-    .addEventListener("click", function () {
+    ?.addEventListener("click", function () {
       Tools.changeTool("connectionBtn", cm);
     });
-  document.getElementById("deleteBtn").addEventListener("click", function (e) {
-    Tools.deletePart(e, cm);
+  document.getElementById("deleteBtn")?.addEventListener("click", function (e) {
+    Tools.deletePart(cm);
   });
-  document.getElementById("undoBtn").addEventListener("click", function () {
+  document.getElementById("undoBtn")?.addEventListener("click", function () {
     cm.undo();
   });
-  document.getElementById("redoBtn").addEventListener("click", function () {
+  document.getElementById("redoBtn")?.addEventListener("click", function () {
     cm.redo();
   });
-  document.getElementById("downloadPNG").addEventListener("click", function () {
-    exportAsPNG(cm.canvas);
-  });
+  document
+    .getElementById("downloadPNG")
+    ?.addEventListener("click", function () {
+      exportAsPNG(cm.canvas);
+    });
   document
     .getElementById("downloadJSON")
-    .addEventListener("click", function () {
+    ?.addEventListener("click", function () {
       exportAsJSON(cm.canvas);
     });
   document
     .getElementById("importFromJSONBtn")
-    .addEventListener("click", function (e) {
+    ?.addEventListener("click", function (e: MouseEvent | TouchEvent) {
       e.stopPropagation();
-      document.getElementById("importFile").click();
+      document.getElementById("importFile")?.click();
     });
   document
     .getElementById("importFile")
-    .addEventListener("change", async function (e) {
-      if (e.target.value !== "") {
+    ?.addEventListener("change", async function (e: Event) {
+      const target = <HTMLInputElement>e.target;
+      if (target.value !== "") {
         await importFromJSON(e, cm);
-        e.target.value = "";
+        target.value = "";
       }
     });
 
-  window.addEventListener("resize", function (e) {
-    const canvas = document.getElementById("workspace");
+  window.addEventListener("resize", function () {
+    const canvas = <HTMLCanvasElement>document.getElementById("workspace");
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
     cm.canvas.width = canvas.clientWidth;
@@ -64,7 +68,7 @@ function setupListeners(cm) {
   /***  Canvas Listeners  ***/
   const canvas = cm.canvas.canvas;
 
-  function handleCanvasMouseDown(e) {
+  function handleCanvasMouseDown(e: MouseEvent | TouchEvent) {
     e.preventDefault();
     e.stopPropagation();
 
@@ -75,9 +79,9 @@ function setupListeners(cm) {
     const shapes = cm.canvas.shapes;
     let validSelection = false;
 
-    if (tool === "selectBtn" || tool === "connectionBtn") {
+    if ((tool === "selectBtn" || tool === "connectionBtn") && mouse) {
       for (let i = shapes.length - 1; i >= 0; i--) {
-        if (shapes[i].contains(mouse.x, mouse.y, cm.canvas.canvas)) {
+        if (shapes[i].contains(mouse.x, mouse.y)) {
           const selectedShape = shapes[i];
 
           cm.canvas.selection = selectedShape;
@@ -85,21 +89,32 @@ function setupListeners(cm) {
           validSelection = true;
           // Keep track of where in the object we clicked
           // so we can move it smoothly (see mousemove)
-          cm.canvas.dragoffx = mouse.x - selectedShape.x;
-          cm.canvas.dragoffy = mouse.y - selectedShape.y;
+          if (selectedShape instanceof Station) {
+            cm.canvas.dragoffx = mouse.x - selectedShape.x;
+            cm.canvas.dragoffy = mouse.y - selectedShape.y;
+          }
         }
       }
     }
 
     if (!validSelection && cm.canvas.selection) {
       // Still need to save the values here because of some cases in Firefox
-      if (cm.canvas.selection.type === "station") {
-        cm.canvas.selection.name = document.getElementById("stNameInput").value;
-        cm.canvas.selection.xcoord = document.getElementById("stXInput").value;
-        cm.canvas.selection.ycoord = document.getElementById("stYInput").value;
-        cm.canvas.selection.zcoord = document.getElementById("stZInput").value;
-        cm.canvas.selection.fill =
-          document.getElementById("stColorField").value;
+      if (cm.canvas.selection instanceof Station) {
+        cm.canvas.selection.name = (<HTMLInputElement>(
+          document.getElementById("stNameInput")
+        )).value;
+        cm.canvas.selection.xcoord = Number.parseFloat(
+          (<HTMLInputElement>document.getElementById("stXInput")).value
+        );
+        cm.canvas.selection.ycoord = Number.parseFloat(
+          (<HTMLInputElement>document.getElementById("stYInput")).value
+        );
+        cm.canvas.selection.zcoord = Number.parseFloat(
+          (<HTMLInputElement>document.getElementById("stZInput")).value
+        );
+        cm.canvas.selection.fill = (<HTMLInputElement>(
+          document.getElementById("stColorField")
+        )).value;
       }
       cm.canvas.selection = null;
       cm.canvas.valid = false; // Need to clear the old selection border
@@ -110,8 +125,13 @@ function setupListeners(cm) {
 
     if (tool === "selectBtn") {
       cm.canvas.valid = false; // force redraw
-      Tools.handleSelectMouseDown(e, cm);
-    } else if (tool === "connectionBtn" && cm.canvas.selection) {
+      Tools.handleSelectMouseDown(cm);
+    } else if (
+      tool === "connectionBtn" &&
+      cm.canvas.selection &&
+      cm.canvas.selection instanceof Station &&
+      mouse
+    ) {
       const selection = cm.canvas.selection;
       let connectColor = window.matchMedia("(prefers-color-scheme: dark)")
         .matches
@@ -140,7 +160,7 @@ function setupListeners(cm) {
     }
   }
 
-  function handleCanvasMouseMove(e) {
+  function handleCanvasMouseMove(e: MouseEvent | TouchEvent) {
     e.preventDefault();
     e.stopPropagation();
 
@@ -155,13 +175,15 @@ function setupListeners(cm) {
       const offset = cm.canvas.getMouseOffset();
       let mouse = getEventMouseCoords(e, offset);
 
-      cm.canvas.activeLine.end.x = mouse.x;
-      cm.canvas.activeLine.end.y = mouse.y;
-      cm.canvas.valid = false;
+      if (mouse && cm.canvas.activeLine) {
+        cm.canvas.activeLine.end.x = mouse.x;
+        cm.canvas.activeLine.end.y = mouse.y;
+        cm.canvas.valid = false;
+      }
     }
   }
 
-  function handleCanvasMouseUp(e) {
+  function handleCanvasMouseUp(e: MouseEvent | TouchEvent) {
     e.preventDefault();
     e.stopPropagation();
     cm.canvas.dragging = false;
@@ -171,7 +193,7 @@ function setupListeners(cm) {
         Tools.handleAddStation(e, cm);
         break;
       case "selectBtn":
-        Tools.handleShapeMoveEnd(e, cm);
+        Tools.handleShapeMoveEnd(cm);
         break;
       case "connectionBtn":
         if (cm.canvas.connecting) {
@@ -182,20 +204,26 @@ function setupListeners(cm) {
           const offset = cm.canvas.getMouseOffset();
           let mouse = getEventMouseCoords(e, offset);
           const shapes = cm.canvas.shapes;
-          for (let i = shapes.length - 1; i >= 0; i--) {
-            if (
-              shapes[i].type === "station" &&
-              shapes[i].contains(mouse.x, mouse.y) &&
-              shapes[i].id !== cm.canvas.selection.id
-            ) {
-              // was a valid shape, we're happy
-              validConnection = true;
-              cm.canvas.activeLine.end = shapes[i];
-              shapes[i].connections.push(cm.canvas.activeLine);
-              cm.addToUndoHistory(new HistoryStep("add", cm.canvas.activeLine));
+          if (mouse && cm.canvas.selection && cm.canvas.activeLine) {
+            for (let i = shapes.length - 1; i >= 0; i--) {
+              const checkShape = shapes[i];
+              if (
+                checkShape instanceof Station &&
+                checkShape.contains(mouse.x, mouse.y) &&
+                checkShape.id !== cm.canvas.selection.id
+              ) {
+                // was a valid shape, we're happy
+                validConnection = true;
+                cm.canvas.activeLine.end = checkShape;
+                checkShape.connections.push(cm.canvas.activeLine);
+                cm.addToUndoHistory(
+                  new HistoryStep({ type: "add", obj: cm.canvas.activeLine })
+                );
+              }
             }
           }
-          if (!validConnection) {
+
+          if (!validConnection && cm.canvas.activeLine) {
             cm.canvas.removeShape(cm.canvas.activeLine);
           }
           cm.canvas.activeLine = null;
@@ -231,7 +259,7 @@ function setupListeners(cm) {
 }
 
 function initCanvas() {
-  const canvas = document.getElementById("workspace");
+  const canvas = <HTMLCanvasElement>document.getElementById("workspace");
   canvas.width = canvas.clientWidth;
   canvas.height = canvas.clientHeight;
   return new CanvasState(canvas);

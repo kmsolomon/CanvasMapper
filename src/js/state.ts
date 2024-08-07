@@ -1,30 +1,32 @@
-export default class CanvasState {
-  #canvas;
-  #width;
-  #height;
-  #ctx;
-  #stylePaddingLeft = 0;
-  #stylePaddingTop = 0;
-  #styleBorderLeft = 0;
-  #styleBorderTop = 0;
-  #valid = false; // false to redraw
-  #shapes = []; // the stations, connections, etc. to draw
-  #dragging = false; // need to know when dragging
-  #activeLine = null;
-  #connecting = false; // know when we're drawing a connection
-  #selection = null;
-  #moveStart = { x: null, y: null };
-  #dragoffx = 0;
-  #dragoffy = 0;
-  #selectionColor = "#3e6659";
-  #selectionOffset = 2;
-  #selectionWidth = 2;
-  #interval = 30;
-  #bgColor = "#FFFFFF";
-  #htmlTop = document.body.parentNode.offsetTop;
-  #htmlLeft = document.body.parentNode.offsetLeft;
+import Connection from "./connection";
+import Station from "./station";
+import { HistoryImport, HistoryMove, Point } from "./types";
 
-  constructor(canvas) {
+export default class CanvasState {
+  #canvas: HTMLCanvasElement;
+  #width: number;
+  #height: number;
+  #ctx: CanvasRenderingContext2D | null;
+  #stylePaddingLeft: number = 0;
+  #stylePaddingTop: number = 0;
+  #styleBorderLeft: number = 0;
+  #styleBorderTop: number = 0;
+  #valid: boolean = false; // false to redraw
+  #shapes: (Station | Connection)[] = []; // the stations, connections, etc. to draw
+  #dragging: boolean = false; // need to know when dragging
+  #activeLine: Connection | null = null;
+  #connecting: boolean = false; // know when we're drawing a connection
+  #selection: Station | Connection | null = null;
+  #moveStart: Point | null = null;
+  #dragoffx: number = 0;
+  #dragoffy: number = 0;
+  #selectionColor: string = "#3e6659";
+  #selectionOffset: number = 2;
+  #selectionWidth: number = 2;
+  #interval: number = 30;
+  #bgColor: string = "#FFFFFF";
+
+  constructor(canvas: HTMLCanvasElement) {
     this.#canvas = canvas;
     this.#width = canvas.width;
     this.#height = canvas.height;
@@ -48,7 +50,7 @@ export default class CanvasState {
     return this.#dragging;
   }
 
-  set dragging(d) {
+  set dragging(d: boolean) {
     this.#dragging = d;
   }
 
@@ -64,7 +66,7 @@ export default class CanvasState {
     return this.#selection;
   }
 
-  set selection(shape) {
+  set selection(shape: Station | Connection | null) {
     this.#selection = shape;
   }
 
@@ -72,7 +74,7 @@ export default class CanvasState {
     return this.#dragoffx;
   }
 
-  set dragoffx(i) {
+  set dragoffx(i: number) {
     this.#dragoffx = i;
   }
 
@@ -80,7 +82,7 @@ export default class CanvasState {
     return this.#dragoffy;
   }
 
-  set dragoffy(i) {
+  set dragoffy(i: number) {
     this.#dragoffy = i;
   }
 
@@ -92,7 +94,7 @@ export default class CanvasState {
     return this.#valid;
   }
 
-  set valid(b) {
+  set valid(b: boolean) {
     this.#valid = b;
   }
 
@@ -100,7 +102,7 @@ export default class CanvasState {
     return this.#activeLine;
   }
 
-  set activeLine(l) {
+  set activeLine(l: Connection | null) {
     this.#activeLine = l;
   }
 
@@ -108,19 +110,19 @@ export default class CanvasState {
     return this.#connecting;
   }
 
-  set connecting(b) {
+  set connecting(b: boolean) {
     this.#connecting = b;
   }
 
-  set width(w) {
+  set width(w: number) {
     this.#width = w;
   }
 
-  set height(h) {
+  set height(h: number) {
     this.#height = h;
   }
 
-  set moveStart(coords) {
+  set moveStart(coords: Point | null) {
     if (this.#dragging) {
       this.#moveStart = coords;
     }
@@ -130,36 +132,37 @@ export default class CanvasState {
     return this.#moveStart;
   }
 
-  addShape(shape) {
+  addShape(shape: Station | Connection) {
     this.#shapes.push(shape);
     this.#valid = false;
   }
 
-  removeShape(shape) {
+  removeShape(shape: Station | Connection) {
     const l = this.#shapes.length;
     for (let i = l - 1; i >= 0; i--) {
-      if (this.#shapes[i].id === shape.id) {
+      const checkShape = this.#shapes[i];
+      if (checkShape.id === shape.id) {
         this.#selection = null;
         this.#valid = false;
         this.#shapes = this.#shapes.filter((s) => s.id !== shape.id);
       }
       if (
-        shape.type === "station" &&
-        this.#shapes[i]?.type === "connection" &&
-        this.#shapes[i].includes(shape)
+        shape instanceof Station &&
+        checkShape instanceof Connection &&
+        checkShape.includes(shape)
       ) {
-        this.removeShape(this.#shapes[i]);
-      } else if (shape.type === "connection") {
+        this.removeShape(checkShape);
+      } else if (shape instanceof Connection) {
         // need to make sure we take it out of the station connection arrays
         const start = shape.start;
         const end = shape.end;
-        if (start.type === "station" && end.type !== "station") {
+        if (start instanceof Station && !(end instanceof Station)) {
           for (let j = 0; j < start.connections.length; j++) {
             if (start.connections && start.connections[j].id === shape.id) {
               start.connections.splice(j, 1);
             }
           }
-        } else if (end.type === "station" && start.type !== "station") {
+        } else if (end instanceof Station && !(start instanceof Station)) {
           for (let j = 0; j < end.connections.length; j++) {
             if (end.connections && end.connections[j].id === shape.id) {
               end.connections.splice(j, 1);
@@ -170,25 +173,25 @@ export default class CanvasState {
     }
   }
 
-  removeShapes(shapes) {
+  removeImportedShapes(shapes: HistoryImport) {
     for (const shape of shapes.importedShapes) {
       this.removeShape(shape);
     }
   }
 
-  addShapes(shapes) {
+  addImportedShapes(shapes: HistoryImport) {
     for (const shape of shapes.importedShapes) {
       this.addShape(shape);
     }
   }
 
-  modifyShape(id, x, y) {
-    // would be better to switch that to an options {}
+  modifyShape(step: HistoryMove) {
     const l = this.#shapes.length;
     for (let i = l - 1; i >= 0; i--) {
-      if (this.#shapes[i].id === id) {
-        this.#shapes[i].x = x;
-        this.#shapes[i].y = y;
+      const shape = this.#shapes[i];
+      if (shape instanceof Station && shape.id === step.id) {
+        shape.x = step.x;
+        shape.y = step.y;
         this.#valid = false;
         return;
       }
@@ -196,11 +199,13 @@ export default class CanvasState {
   }
 
   clear() {
-    this.#ctx.clearRect(0, 0, this.#width, this.#height);
+    if (this.#ctx !== null) {
+      this.#ctx.clearRect(0, 0, this.#width, this.#height);
+    }
   }
 
   draw() {
-    if (!this.#valid) {
+    if (!this.#valid && this.#ctx !== null) {
       const ctx = this.#ctx;
       const shapes = this.#shapes;
       this.clear();
@@ -214,7 +219,8 @@ export default class CanvasState {
           return;
         }
         if (
-          shape.type === "connection" &&
+          shape instanceof Connection &&
+          shape.start instanceof Station &&
           shape.start.x + shape.start.w >= 0 &&
           shape.start.y + shape.start.h >= 0 &&
           shape.start.x <= this.#width &&
@@ -231,7 +237,7 @@ export default class CanvasState {
           return;
         }
         if (
-          shape.type === "station" &&
+          shape instanceof Station &&
           shape.x <= this.#width &&
           shape.y <= this.#height &&
           shape.x + shape.w >= 0 &&
@@ -247,21 +253,21 @@ export default class CanvasState {
         ctx.lineWidth = this.#selectionWidth;
         const mySel = this.#selection;
 
-        if (mySel.shape === "square") {
+        if (mySel instanceof Station && mySel.shape === "square") {
           ctx.strokeRect(
             mySel.x - this.#selectionOffset,
             mySel.y - this.#selectionOffset,
             mySel.w + 2 * this.#selectionOffset,
             mySel.h + 2 * this.#selectionOffset
           );
-        } else if (mySel.shape === "circle") {
+        } else if (mySel instanceof Station && mySel.shape === "circle") {
           const path = new Path2D();
           const xCenter = mySel.x + mySel.w / 2;
           const yCenter = mySel.y + mySel.h / 2;
           path.arc(xCenter, yCenter, mySel.w / 2 + 3, 0, 2 * Math.PI, false);
           ctx.stroke(path);
           ctx.closePath();
-        } else if (mySel.shape === "triangle") {
+        } else if (mySel instanceof Station && mySel.shape === "triangle") {
           const path = new Path2D();
           path.moveTo(mySel.x + mySel.w / 2, mySel.y - 5);
           path.lineTo(
@@ -271,7 +277,7 @@ export default class CanvasState {
           path.lineTo(mySel.x - mySel.w / 5 - 5, mySel.y + mySel.h + 2.5);
           path.closePath();
           ctx.stroke(path);
-        } else if (mySel.shape === "diamond") {
+        } else if (mySel instanceof Station && mySel.shape === "diamond") {
           const path = new Path2D();
           path.moveTo(mySel.x + mySel.w / 2, mySel.y - 4);
           path.lineTo(mySel.x + mySel.w + 4, mySel.y + mySel.h / 2);
@@ -279,7 +285,7 @@ export default class CanvasState {
           path.lineTo(mySel.x - 4, mySel.y + mySel.h / 2);
           path.closePath();
           ctx.stroke(path);
-        } else if (mySel.shape === "star") {
+        } else if (mySel instanceof Station && mySel.shape === "star") {
           const path = new Path2D();
           const points = 5;
           const starX = mySel.x + mySel.w / 2;
@@ -307,20 +313,13 @@ export default class CanvasState {
       offsetY = 0;
 
     offsetX +=
-      canvas.offsetLeft +
-      this.#stylePaddingLeft +
-      this.#styleBorderLeft +
-      this.#htmlLeft;
-    offsetY +=
-      canvas.offsetTop +
-      this.#stylePaddingTop +
-      this.#styleBorderTop +
-      this.#htmlTop;
+      canvas.offsetLeft + this.#stylePaddingLeft + this.#styleBorderLeft;
+    offsetY += canvas.offsetTop + this.#stylePaddingTop + this.#styleBorderTop;
 
     return { x: offsetX, y: offsetY };
   }
 
-  enableDarkMode(b) {
+  enableDarkMode(b: boolean) {
     if (b) {
       this.#bgColor = "#343434";
       this.#selectionColor = "#dcefe6";

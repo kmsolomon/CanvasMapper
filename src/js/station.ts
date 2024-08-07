@@ -1,23 +1,35 @@
-export default class Station {
-  #x = 0;
-  #y = 0;
-  #w = 1;
-  #h = 1;
-  #fill = "#AAAAAA";
-  #borderColor = "#AAAAAA";
-  #name = null;
-  #xcoord = 0;
-  #ycoord = 0;
-  #zcoord = 0;
-  #smallPadding = 5;
-  #largePadding = 12;
-  #path = null;
-  #shape = "square";
-  #id = null;
-  #connections = new Array();
-  type = "station";
+import Connection from "./connection";
+import { StationShape, isTypeStationShape } from "./types";
 
-  constructor(x, y, w, h, fill, snum, shape = "square", borderColor) {
+export default class Station {
+  #x: number = 0;
+  #y: number = 0;
+  #w: number = 1;
+  #h: number = 1;
+  #fill: string = "#AAAAAA";
+  #borderColor: string = "#AAAAAA";
+  #name: string = "";
+  #xcoord: number = 0;
+  #ycoord: number = 0;
+  #zcoord: number = 0;
+  #smallPadding: number = 5;
+  #largePadding: number = 12;
+  #path: Path2D | null = null;
+  #shape: StationShape = "square";
+  #id: string;
+  #connections: Connection[] = new Array<Connection>();
+  type: string = "station";
+
+  constructor(
+    x: number,
+    y: number,
+    w: number,
+    h: number,
+    fill: string,
+    snum: string,
+    shape: StationShape = "square",
+    borderColor: string | undefined
+  ) {
     this.#x = x;
     this.#y = y;
     this.#w = w;
@@ -26,16 +38,13 @@ export default class Station {
       this.#fill = fill;
     }
     this.#id = snum;
-    if (
-      shape === "square" ||
-      shape === "circle" ||
-      shape === "diamond" ||
-      shape === "triangle" ||
-      shape === "star"
-    ) {
+    if (isTypeStationShape(shape)) {
       this.#shape = shape;
     }
-    if (/^#[0-9A-F]{6}$/i.test(borderColor)) {
+    if (
+      typeof borderColor === "string" &&
+      /^#[0-9A-F]{6}$/i.test(borderColor)
+    ) {
       this.#borderColor = borderColor;
     }
     this.draw = this.draw.bind(this);
@@ -43,7 +52,7 @@ export default class Station {
     this.toJSON = this.toJSON.bind(this);
   }
 
-  static clone(original) {
+  static clone(original: Station): Station {
     const cloned = new Station(
       original.x,
       original.y,
@@ -62,7 +71,7 @@ export default class Station {
     return cloned;
   }
 
-  draw(ctx) {
+  draw(ctx: CanvasRenderingContext2D) {
     ctx.fillStyle = this.#fill;
     ctx.strokeStyle = this.#borderColor;
     ctx.lineWidth = 2;
@@ -144,7 +153,7 @@ export default class Station {
     }
   }
 
-  contains(mx, my) {
+  contains(mx: number, my: number) {
     if (this.#shape === "square") {
       return (
         this.#x <= mx &&
@@ -153,9 +162,15 @@ export default class Station {
         this.#y + this.#h >= my
       );
     } else {
-      const canvas = document.getElementById("workspace");
-      const ctx = canvas.getContext("2d");
-      return ctx.isPointInPath(this.#path, mx, my);
+      const canvas = <HTMLCanvasElement | null>(
+        document.getElementById("workspace")
+      );
+      const ctx = canvas ? canvas.getContext("2d") : null;
+      if (canvas && ctx && this.#path) {
+        return ctx.isPointInPath(this.#path, mx, my);
+      } else {
+        return false;
+      }
     }
   }
 
@@ -185,15 +200,19 @@ export default class Station {
     return this.#name;
   }
 
-  set name(n) {
-    this.#name = n;
+  set name(n: string) {
+    if (n.trim() !== "") {
+      this.#name = n.trim();
+    } else {
+      this.#name = "";
+    }
   }
 
   get xcoord() {
     return this.#xcoord;
   }
 
-  set xcoord(n) {
+  set xcoord(n: number) {
     this.#xcoord = n;
   }
 
@@ -201,7 +220,7 @@ export default class Station {
     return this.#ycoord;
   }
 
-  set ycoord(n) {
+  set ycoord(n: number) {
     this.#ycoord = n;
   }
 
@@ -209,7 +228,7 @@ export default class Station {
     return this.#zcoord;
   }
 
-  set zcoord(n) {
+  set zcoord(n: number) {
     this.#zcoord = n;
   }
 
@@ -217,7 +236,7 @@ export default class Station {
     return this.#fill;
   }
 
-  set fill(n) {
+  set fill(n: string) {
     if (/^#[0-9A-F]{6}$/i.test(n)) {
       this.#fill = n;
     }
@@ -227,7 +246,7 @@ export default class Station {
     return this.#x;
   }
 
-  set x(n) {
+  set x(n: number) {
     this.#x = n;
   }
 
@@ -235,7 +254,7 @@ export default class Station {
     return this.#y;
   }
 
-  set y(n) {
+  set y(n: number) {
     this.#y = n;
   }
 
@@ -255,7 +274,7 @@ export default class Station {
     return this.#connections;
   }
 
-  set connections(c) {
+  set connections(c: Connection[]) {
     this.#connections = c;
   }
 
@@ -263,14 +282,8 @@ export default class Station {
     return this.#shape;
   }
 
-  set shape(s) {
-    if (
-      s === "square" ||
-      s === "circle" ||
-      s === "triangle" ||
-      s === "diamond" ||
-      s === "star"
-    ) {
+  set shape(s: StationShape) {
+    if (isTypeStationShape(s)) {
       this.#shape = s;
     } else {
       throw new Error(`Invalid station shape: ${s}`);
@@ -281,7 +294,7 @@ export default class Station {
     return this.#borderColor;
   }
 
-  set borderColor(c) {
+  set borderColor(c: string) {
     if (/^#[0-9A-F]{6}$/i.test(c)) {
       this.#borderColor = c;
     }

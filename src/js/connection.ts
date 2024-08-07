@@ -1,15 +1,24 @@
+import Station from "./station";
+import { LineStyle, Point } from "./types";
+
 export default class Connection {
-  #start;
-  #end;
-  #color;
-  #width;
-  #stationMidpoint = 15;
-  #path;
-  #padding = 2;
-  #style = "solid";
-  #id;
-  type = "connection";
-  constructor(start, end, cnum, color = "#000000", style = "solid", width = 2) {
+  #start: Station | Point;
+  #end: Station | Point;
+  #color: string;
+  #width: number;
+  #stationMidpoint: number = 15;
+  #path: Path2D | null = null;
+  #style: LineStyle = "solid";
+  #id: string;
+  type: string = "connection";
+  constructor(
+    start: Station | Point,
+    end: Station | Point,
+    cnum: string,
+    color: string = "#000000",
+    style: LineStyle = "solid",
+    width: number = 2
+  ) {
     this.#start = start;
     this.#end = end;
     this.#color = color;
@@ -23,7 +32,7 @@ export default class Connection {
     this.toJSON = this.toJSON.bind(this);
   }
 
-  static clone(original) {
+  static clone(original: Connection): Connection {
     const cloned = new Connection(
       original.start,
       original.end,
@@ -39,7 +48,7 @@ export default class Connection {
     return this.#start;
   }
 
-  set start(s) {
+  set start(s: Station | Point) {
     this.#start = s;
   }
 
@@ -47,7 +56,7 @@ export default class Connection {
     return this.#end;
   }
 
-  set end(e) {
+  set end(e: Station | Point) {
     this.#end = e;
   }
 
@@ -59,7 +68,7 @@ export default class Connection {
     return this.#width;
   }
 
-  set width(n) {
+  set width(n: number) {
     if (n >= 1 && n <= 100) {
       this.#width = Math.floor(n);
     } else if (n > 100) {
@@ -73,29 +82,21 @@ export default class Connection {
     return this.#style;
   }
 
-  set style(s) {
-    if (
-      s === "solid" ||
-      s === "dash" ||
-      s === "large-dash" ||
-      s === "dots" ||
-      s === "dash-dot"
-    ) {
-      this.#style = s;
-    }
+  set style(s: LineStyle) {
+    this.#style = s;
   }
 
   get color() {
     return this.#color;
   }
 
-  set color(n) {
+  set color(n: string) {
     if (/^#[0-9A-F]{6}$/i.test(n)) {
       this.#color = n;
     }
   }
 
-  static getLinePattern(n) {
+  static getLinePattern(n: LineStyle): number[] {
     switch (n) {
       case "solid":
         return [];
@@ -112,7 +113,7 @@ export default class Connection {
     }
   }
 
-  draw(ctx) {
+  draw(ctx: CanvasRenderingContext2D) {
     ctx.strokeStyle = this.#color;
     ctx.lineWidth = this.#width;
     ctx.setLineDash(Connection.getLinePattern(this.#style));
@@ -121,7 +122,7 @@ export default class Connection {
       this.#start.x + this.#stationMidpoint,
       this.#start.y + this.#stationMidpoint
     );
-    if (this.#end.type == "station") {
+    if (this.#end instanceof Station) {
       path.lineTo(
         this.#end.x + this.#stationMidpoint,
         this.#end.y + this.#stationMidpoint
@@ -136,11 +137,15 @@ export default class Connection {
     this.#path = path;
   }
 
-  contains(mx, my) {
-    const canvas = document.getElementById("workspace");
-    const ctx = canvas.getContext("2d");
+  contains(mx: number, my: number): boolean {
+    const canvas = <HTMLCanvasElement | null>(
+      document.getElementById("workspace")
+    );
+    const ctx = canvas ? canvas.getContext("2d") : null;
     let contained = false;
-    if (this.#width < 6) {
+    if (canvas === null || ctx === null || this.#path === null) {
+      return false;
+    } else if (this.#width < 6) {
       ctx.lineWidth = 6; // tolerance to make it easier to select a line
     } else {
       ctx.lineWidth = this.#width;
@@ -150,11 +155,17 @@ export default class Connection {
     return contained;
   }
 
-  includes(s) {
-    return this.#end.id === s.id || this.#start.id === s.id;
+  includes(s: Station): boolean {
+    if (this.#start instanceof Station) {
+      return this.#start.id === s.id;
+    } else if (this.#end instanceof Station) {
+      return this.#end.id === s.id;
+    } else {
+      return false;
+    }
   }
 
-  toJSON() {
+  toJSON(): string {
     const obj = {
       id: this.#id,
       type: this.type,

@@ -1,6 +1,12 @@
-export function getEventMouseCoords(e, offset = { x: 0, y: 0 }) {
-  let mouse = null;
+import { Point } from "./types";
+
+export function getEventMouseCoords(
+  e: TouchEvent | MouseEvent,
+  offset = { x: 0, y: 0 }
+): Point | null {
+  let mouse: Point | null = null;
   if (
+    e instanceof TouchEvent &&
     (e.type === "touchstart" ||
       e.type === "touchmove" ||
       e.type === "touchend") &&
@@ -10,13 +16,13 @@ export function getEventMouseCoords(e, offset = { x: 0, y: 0 }) {
       x: e.changedTouches[0].pageX - offset.x,
       y: e.changedTouches[0].pageY - offset.y,
     };
-  } else {
+  } else if (e instanceof MouseEvent) {
     mouse = { x: e.pageX - offset.x, y: e.pageY - offset.y };
   }
   return mouse;
 }
 
-export function roundNum(x) {
+export function roundNum(x: number): number {
   const multi = Math.pow(10, 2 || 0);
   return Math.round(x * multi) / multi;
 }
