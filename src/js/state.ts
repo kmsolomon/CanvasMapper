@@ -156,7 +156,18 @@ export default class CanvasState {
         // need to make sure we take it out of the station connection arrays
         const start = shape.start;
         const end = shape.end;
-        if (start instanceof Station && !(end instanceof Station)) {
+        if (start instanceof Station && end instanceof Station) {
+          for (let j = 0; j < start.connections.length; j++) {
+            if (start.connections && start.connections[j].id === shape.id) {
+              start.connections.splice(j, 1);
+            }
+          }
+          for (let j = 0; j < end.connections.length; j++) {
+            if (end.connections && end.connections[j].id === shape.id) {
+              end.connections.splice(j, 1);
+            }
+          }
+        } else if (start instanceof Station && !(end instanceof Station)) {
           for (let j = 0; j < start.connections.length; j++) {
             if (start.connections && start.connections[j].id === shape.id) {
               start.connections.splice(j, 1);
