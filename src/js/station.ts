@@ -140,7 +140,7 @@ export default class Station {
       ctx.fillStyle = textBg;
       ctx.fillRect(
         this.#x - center - 2,
-        this.#y + this.#h,
+        this.#y + this.#h + 2,
         metrics.width + 4,
         halfStation
       );
