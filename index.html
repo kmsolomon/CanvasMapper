@@ -1,41 +1,142 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>CanvasMapper</title>
-    <link type="text/css" rel="stylesheet" href="css/main.css"/>
-    <link type="text/css" rel="stylesheet" href="css/spectrum.css"/>
-    <script data-main="js/main" src="js/lib/require.js"></script>
-   </head>
-   <body>
-     <div class="header">
-     <h1>CanvasMapper</h1>
-     </div>
-     <div id="toolbarDiv">
-       <ul id="toolbar">
-         <li id="select" class="active selectBtn"></li>
-         <li id="addStation" class ="stationBtn"></li>
-         <li id="addConnection" class="connectionBtn"></li>
-         <li id="delete" class="deleteBtn"></li>  
-         <li id="undo" class="undoBtn"></li>
-         <li id="redo" class="redoBtn"></li>
-       </ul>  
-     </div>
-     <div id="saveDiv">
-          <ul id="saveMenu">
-            <li id="downloadPNG" download="canvasMap.png">Download as PNG</li>
-            <li id="downloadJSON" download="application/json">Download as JSON</li>
-            <li id="importJSON">
-              <label id="importFromJSONBtn" for="importFile">Import from JSON</label>
-              <input id="importFile" type="file" name="jsonFile" accept="application/json"></li>
-          </ul>
-       </div>
-     <div id="properties">
-         <h1>Properties</h1>
-         <div id="propdiv">
-           Nothing is selected
-         </div>
-     </div>
-     <canvas id="workspace"></canvas>
-   </body>
+    <link type="text/css" rel="stylesheet" href="/src/styles/main.css" />
+  </head>
+  <body>
+    <header>
+      <h1>CanvasMapper</h1>
+    </header>
+    <main class="content">
+      <div class="main-grid">
+        <div class="tools">
+          <div class="toolbar">
+            <button
+              id="selectBtn"
+              class="active btn"
+              aria-label="Select"
+              aria-pressed="true"
+            ></button>
+            <button
+              id="stationBtn"
+              class="btn"
+              aria-label="Add station"
+              aria-pressed="false"
+            ></button>
+            <button
+              id="connectionBtn"
+              class="btn"
+              aria-label="Add conneciton"
+              aria-pressed="false"
+            ></button>
+            <button
+              id="deleteBtn"
+              class="btn"
+              aria-label="Delete selected"
+            ></button>
+            <button id="undoBtn" class="btn" aria-label="Undo"></button>
+            <button id="redoBtn" class="btn" aria-label="Redo"></button>
+          </div>
+        </div>
+        <div class="canvas-mapper">
+          <div class="canvas-wrapper">
+            <canvas id="workspace"
+              >A space for drawing a map of connected stations</canvas
+            >
+          </div>
+        </div>
+        <div id="properties">
+          <h2>Properties</h2>
+          <div id="propdiv">Nothing is selected</div>
+        </div>
+      </div>
+      <div id="importExportOptions">
+        <button id="downloadPNG" type="button" download="canvasMap.png">
+          Download as PNG
+        </button>
+        <button id="downloadJSON" type="button" download="application/json">
+          Download as JSON
+        </button>
+        <button id="importFromJSONBtn" type="button">Import from JSON</button>
+        <input
+          id="importFile"
+          type="file"
+          name="jsonFile"
+          accept="application/json"
+        />
+      </div>
+    </main>
+    <footer>
+      <a href="https://github.com/kmsolomon/CanvasMapper"
+        >View project on github</a
+      >
+    </footer>
+    <template id="emptyProps"> Nothing is selected </template>
+    <template id="stationProps">
+      <div id="stProperties">
+        <div class="input-group">
+          <label for="stNameInput">Name: </label>
+          <input id="stNameInput" type="text" />
+        </div>
+        <div class="input-group">
+          <label for="stXInput">X coordinate: </label>
+          <input id="stXInput" type="number" />
+        </div>
+        <div class="input-group">
+          <label for="stYInput">Y coordinate: </label>
+          <input id="stYInput" type="number" />
+        </div>
+        <div class="input-group">
+          <label for="stZInput">Z coordinate: </label>
+          <input id="stZInput" type="number" />
+        </div>
+        <div class="input-group-group">
+          <div class="input-group">
+            <label for="stColorField">Fill color: </label>
+            <input id="stColorField" type="color" />
+          </div>
+          <div class="input-group">
+            <label for="stBorderColorField">Border color: </label>
+            <input id="stBorderColorField" type="color" />
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="stShapeSelect">Shape:</label>
+          <select id="stShapeSelect">
+            <option value="square">Square</option>
+            <option value="circle">Circle</option>
+            <option value="triangle">Triangle</option>
+            <option value="diamond">Diamond</option>
+            <option value="star">Star</option>
+          </select>
+        </div>
+      </div>
+    </template>
+    <template id="connectionProps">
+      <div id="connectionProperties">
+        <div class="input-group">
+          <label for="lineWidthInput">Line width: </label>
+          <input id="lineWidthInput" type="number" min="1" max="100" step="1" />
+        </div>
+        <div class="input-group">
+          <label for="lineStyleInput">Line style: </label>
+          <select id="lineStyleInput">
+            <option value="solid">Solid</option>
+            <option value="dash">Small dash</option>
+            <option value="large-dash">Large dash</option>
+            <option value="dots">Dotted</option>
+            <option value="dash-dot">Dash-dot</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label for="lineColorField">Color: </label>
+          <input id="lineColorField" type="color" />
+        </div>
+      </div>
+    </template>
+    <script type="module" src="/src/js/main.ts"></script>
+  </body>
 </html>

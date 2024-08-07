@@ -1,0 +1,31 @@
+{
+  "name": "canvasmapper",
+  "version": "2.0.0",
+  "description": "Canvas-based web app to build mini station maps.",
+  "main": "main.js",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kmsolomon/CanvasMapper.git"
+  },
+  "author": "kmsolomon",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kmsolomon/CanvasMapper/issues"
+  },
+  "homepage": "https://github.com/kmsolomon/CanvasMapper#readme",
+  "devDependencies": {
+    "@types/node": "^22.1.0",
+    "eslint": "^9.8.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.3.3",
+    "typescript": "^5.5.4",
+    "vite": "^5.2.13"
+  }
+}
