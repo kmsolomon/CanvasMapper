@@ -153,18 +153,22 @@ export default class CanvasState {
       ) {
         this.removeShape(checkShape);
       } else if (shape instanceof Connection) {
-        // need to make sure we take it out of the station connection arrays
+        // need to make sure we take it out of the station connection arrays that are still on the canvas
         const start = shape.start;
         const end = shape.end;
         if (start instanceof Station && end instanceof Station) {
-          for (let j = 0; j < start.connections.length; j++) {
-            if (start.connections && start.connections[j].id === shape.id) {
-              start.connections.splice(j, 1);
+          if (this.#includesShape(start.id)) {
+            for (let j = 0; j < start.connections.length; j++) {
+              if (start.connections && start.connections[j].id === shape.id) {
+                start.connections.splice(j, 1);
+              }
             }
           }
-          for (let j = 0; j < end.connections.length; j++) {
-            if (end.connections && end.connections[j].id === shape.id) {
-              end.connections.splice(j, 1);
+          if (this.#includesShape(end.id)) {
+            for (let j = 0; j < end.connections.length; j++) {
+              if (end.connections && end.connections[j].id === shape.id) {
+                end.connections.splice(j, 1);
+              }
             }
           }
         } else if (start instanceof Station && !(end instanceof Station)) {
@@ -339,6 +343,15 @@ export default class CanvasState {
       this.#selectionColor = "#3e6659";
     }
     this.#valid = false;
+  }
+
+  #includesShape(id: string): boolean {
+    for (const obj of this.#shapes) {
+      if (id === obj.id) {
+        return true;
+      }
+    }
+    return false;
   }
 
   // IDK what this was for, commenting out to see what happens
